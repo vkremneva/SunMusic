@@ -13,6 +13,7 @@ public class DFTStraight {
      *
      * @param buffer an array of the magnitudes
      * @return an array of magnitude values at frequencies
+     * @throws IllegalArgumentException if buffer is empty
      */
     public static double[] run(double[] buffer) throws IllegalArgumentException {
 

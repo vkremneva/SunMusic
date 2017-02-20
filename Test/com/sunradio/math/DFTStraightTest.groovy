@@ -54,9 +54,10 @@ class DFTStraightTest extends GroovyTestCase {
     }
 
     //f(t) = sin(NUMBER*t)
-    //Number should be less than SPLIT and more than SPLIT/2
-    //because of the sinus period
-    public void testSinMultConst() {
+    public void testSinMultConst() throws IllegalArgumentException{
+
+        if ((NUMBER > SPLIT) || (NUMBER < SPLIT / 2))
+            throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period");
 
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
