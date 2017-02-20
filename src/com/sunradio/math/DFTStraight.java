@@ -12,7 +12,7 @@ public class DFTStraight {
     /** Run transform.
      *
      * @param buffer an array of the magnitudes
-     * @return an array of magnitudes values at frequencies
+     * @return an array of magnitude values at frequencies
      */
     public static double[] run(double[] buffer) throws IllegalArgumentException {
 
