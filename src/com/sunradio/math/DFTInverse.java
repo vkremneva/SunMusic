@@ -13,7 +13,7 @@ public class DFTInverse {
      * @param transformed an array of the magnitude value at frequencies
      * @return an array of magnitudes
      */
-    public static double[] run(double[] transformed){
+    public static double[] run(Complex[] transformed){
 
         int size = transformed.length;
         Complex c_transformed, exp_degree, magnitude;
@@ -24,14 +24,13 @@ public class DFTInverse {
             magnitude = new Complex(0, 0);
 
             for (int j = 0; j < size; j++) {
-                c_transformed = new Complex(transformed[i]);
+                //c_transformed = new Complex(transformed[i]);
 
                 exp_degree = new Complex(0, 2 * PI * j * i / size);
-                magnitude = magnitude.add(c_transformed.mult(exp_degree.exp()));
-                magnitude = magnitude.div(size);
+                magnitude = magnitude.add(transformed[i].mult(exp_degree.exp()));
             }
-
-            result[i] = magnitude.abs();
+            magnitude = magnitude.div(size);
+            result[i] = magnitude.re();
         }
 
         return result;

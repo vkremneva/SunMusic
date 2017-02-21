@@ -1,13 +1,14 @@
 package com.sunradio.math
 
 import static java.lang.Math.*
+import com.external.Complex;
 
 class DFTStraightTest extends GroovyTestCase {
 
-    final double EPS = 0.00001
-    final int ITERATIONS = 100
-    final int SPLIT = 100
-    final int NUMBER = 80
+    final EPS = 0.00001
+    final ITERATIONS = 100
+    final SPLIT = 100
+    final NUMBER = 80.0
 
     // As a result, a periodic function will contain transformed peaks in not one,
     // but two places. This happens because the periods of the input data become split into "positive"
@@ -25,7 +26,7 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = sin(2 * PI * i / SPLIT)
 
-        result = DFTStraight.run(buffer)
+        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -43,7 +44,7 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = NUMBER * sin(2 * PI * i / SPLIT)
 
-        result = DFTStraight.run(buffer)
+        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer));
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -63,7 +64,7 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = sin(NUMBER * 2 * PI * i / SPLIT)
 
-        result = DFTStraight.run(buffer)
+        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -80,7 +81,7 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = NUMBER*sin(2 * PI * i / SPLIT) + sin(NUMBER * 2 * PI * i / SPLIT)
 
-        result = DFTStraight.run(buffer)
+        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
