@@ -25,11 +25,9 @@ public class DFTInverse {
             for (int j = 0; j < size; j++) {
                 exp_degree = new Complex(0, 2 * PI * j * i / size);
                 magnitude = magnitude.add(transformed[j].mult(exp_degree.exp()));
-                magnitude = magnitude.div(size);
             }
 
-            System.out.println("abs: "+magnitude.abs()+" re:"+magnitude.re());
-            result[i] = magnitude.re() * 2; //works, but why???
+            result[i] = magnitude.re() / size;
         }
 
         return result;

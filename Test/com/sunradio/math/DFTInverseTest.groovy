@@ -21,11 +21,6 @@ class DFTInverseTest extends GroovyTestCase {
         outcome_straight = DFTStraight.run(income)
         outcome_inverse = DFTInverse.run(outcome_straight)
 
-        System.out.println("***income***                       ***outcome amplitudes***                  ***outcome inverse***")
-        for (int i = 0; i < ITERATIONS; i++) {
-            System.out.println(income[i]+"                       "+outcome_straight[i].abs()/ITERATIONS+"                  "+outcome_inverse[i])
-        }
-
         double difference;
         int amount = 0;
         for (int i = 0; i < ITERATIONS; i++) {
