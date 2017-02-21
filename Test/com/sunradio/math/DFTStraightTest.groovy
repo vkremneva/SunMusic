@@ -1,7 +1,6 @@
 package com.sunradio.math
 
 import static java.lang.Math.*
-import com.external.Complex;
 
 class DFTStraightTest extends GroovyTestCase {
 
@@ -44,7 +43,7 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = NUMBER * sin(2 * PI * i / SPLIT)
 
-        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer));
+        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
