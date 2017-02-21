@@ -2,14 +2,15 @@ package com.sunradio.math
 
 import static java.lang.Math.PI
 import static java.lang.Math.sin
+import com.external.Complex;
 
 class DFTInverseTest extends GroovyTestCase {
-    final int EPS = 0.00001
-    final int ITERATIONS = 100
-    final int SPLIT = 100
+    final EPS = 0.00001
+    final ITERATIONS = 100
+    final SPLIT = 100
 
     double[] income = new double[ITERATIONS]
-    double[] outcome_straight = new double[ITERATIONS]
+    Complex[] outcome_straight = new Complex[ITERATIONS]
     double[] outcome_inverse = new double[ITERATIONS]
 
     void testSin() {
@@ -20,18 +21,18 @@ class DFTInverseTest extends GroovyTestCase {
         outcome_straight = DFTStraight.run(income)
         outcome_inverse = DFTInverse.run(outcome_straight)
 
-        System.out.println("***income***                       ***outcome straight***                  ***outcome inverse***");
+        System.out.println("***income***                       ***outcome amplitudes***                  ***outcome inverse***")
         for (int i = 0; i < ITERATIONS; i++) {
-            System.out.println(income[i]+"                       "+outcome_straight[i]+"                  "+outcome_inverse[i]);
+            System.out.println(income[i]+"                       "+outcome_straight[i].abs()/ITERATIONS+"                  "+outcome_inverse[i])
         }
 
         double difference;
         int amount = 0;
         for (int i = 0; i < ITERATIONS; i++) {
-            difference = outcome_inverse[i] - income[i];
+            difference = outcome_inverse[i] - income[i]
             if (difference > EPS) amount++
         }
 
-        assertEquals(0, amount);
+        assertEquals(0, amount)
     }
 }
