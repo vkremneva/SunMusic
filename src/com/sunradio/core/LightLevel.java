@@ -8,15 +8,15 @@ import java.util.Random;
  * LightLevel describes how we get an array of data with current light level
  * @author V.Kremneva
  */
-class LightLevel {
+public class LightLevel {
 
     /**
-     * Get light level from Arduino //TODO: specify
+     * Get randomised light level
      *
      * @param amount of how many measurement of light level we want
      * @return scaled to [0;1] array of light values
      */
-    static double[] getLightLevel(int amount) {
+    public static double[] getFakeLightLevel(int amount) {
 
         //fake it 'till you make it
         Random r = new Random();
@@ -25,5 +25,15 @@ class LightLevel {
             lightLevel[i] = r.nextInt();
 
         return Scale.run(lightLevel, 0, 1);
+    }
+
+    /**
+     * Get light level from Arduino //TODO: specify
+     *
+     * @param amount of how many measurement of light level we want
+     * @return scaled to [0;1] array of light values
+     */
+    static double[] getLightLevel(int amount) {
+        return getFakeLightLevel(amount);
     }
 }
