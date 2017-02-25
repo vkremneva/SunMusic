@@ -9,12 +9,6 @@ class DFTStraightTest extends GroovyTestCase {
     final SPLIT = 100
     final NUMBER = 80.0
 
-    // As a result, a periodic function will contain transformed peaks in not one,
-    // but two places. This happens because the periods of the input data become split into "positive"
-    // and "negative" frequency complex components.
-    // http://mathworld.wolfram.com/DiscreteFourierTransform.html
-    final int meaningful = ITERATIONS/2
-
     double[] buffer = new double[ITERATIONS]
     double[] result = new double[ITERATIONS]
     DFTStraight dftStraight = new DFTStraight()
@@ -29,8 +23,8 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0
-        for (int i = 0; i < meaningful; i++)
+        int amount = 0, size = dftStraight.getSize();
+        for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
 
@@ -48,8 +42,8 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0
-        for (int i = 0; i < meaningful; i++)
+        int amount = 0, size = dftStraight.getSize();
+        for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
 
@@ -69,8 +63,8 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0
-        for (int i = 0; i < meaningful; i++)
+        int amount = 0, size = dftStraight.getSize();
+        for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
 
@@ -90,8 +84,8 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0
-        for (int i = 0; i < meaningful; i++)
+        int amount = 0, size = dftStraight.getSize();
+        for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
 

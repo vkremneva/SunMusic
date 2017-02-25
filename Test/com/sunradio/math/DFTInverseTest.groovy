@@ -2,7 +2,6 @@ package com.sunradio.math
 
 import static java.lang.Math.PI
 import static java.lang.Math.sin
-import com.external.Complex;
 
 class DFTInverseTest extends GroovyTestCase {
     final EPS = 0.00001
@@ -11,7 +10,7 @@ class DFTInverseTest extends GroovyTestCase {
     final NUMBER = 80.0
 
     double[] income = new double[ITERATIONS]
-    Complex[] outcome_straight = new Complex[ITERATIONS]
+    DFTStraight outcome_straight = new DFTStraight()
     double[] outcome_inverse = new double[ITERATIONS]
 
     // f(t) = sin(t)
@@ -20,8 +19,8 @@ class DFTInverseTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             income[i] = sin(2 * PI * i / SPLIT)
 
-        outcome_straight = DFTStraight.run(income)
-        outcome_inverse = DFTInverse.run(outcome_straight)
+        outcome_straight.run(income)
+        outcome_inverse = DFTInverse.run(outcome_straight.getData())
 
         double difference;
         int amount = 0;
@@ -43,8 +42,8 @@ class DFTInverseTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             income[i] = NUMBER*sin(2 * PI * i / SPLIT) + sin(NUMBER * 2 * PI * i / SPLIT)
 
-        outcome_straight = DFTStraight.run(income)
-        outcome_inverse = DFTInverse.run(outcome_straight)
+        outcome_straight.run(income)
+        outcome_inverse = DFTInverse.run(outcome_straight.getData())
 
         double difference;
         int amount = 0;

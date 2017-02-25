@@ -33,8 +33,7 @@ public class Main {
                 frames_read = wavInput.readFrames(buffer, FRAMES);
 
                 transformable.run(buffer);
-                System.out.println(transformable.getMaxAmplitude()+" "+transformable.getMinAmplitude());
-                lightLevel = LightLevel.getLightLevel(indAmount,
+                lightLevel = LightLevel.getLightLevel(transformable.getSize(),
                         transformable.getMinAmplitude(), transformable.getMaxAmplitude());
 
                 modulated = AM.modulate(transformable.getAmplitudes(), lightLevel);

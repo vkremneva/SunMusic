@@ -1,6 +1,9 @@
 package com.sunradio.math;
 
 import com.external.Complex;
+
+import java.util.Arrays;
+
 import static java.lang.Math.PI;
 
 /**
@@ -8,6 +11,27 @@ import static java.lang.Math.PI;
  * @author V.Kremneva
  */
 public class DFTInverse {
+
+    /**
+     * Restore frequency complex components from just one half.
+     *
+     * @param dataToRestore array of data to restore
+     * @return full spectrum Complex array
+     */
+    private static Complex[] restoreData(Complex[] dataToRestore) {
+
+        int oldSize = dataToRestore.length;
+        int newSize = oldSize * 2 - 2;
+        Complex[] result = new Complex[newSize];
+
+        System.arraycopy(dataToRestore, 0, result, 0, oldSize);
+
+        for (int i = oldSize; i < newSize; i++)
+            result[i] = dataToRestore[newSize - i].conj();
+
+        return result;
+    }
+
     /** Run transform.
      *
      * @param transformed a Complex array which contains amplitude and phase values
@@ -15,7 +39,10 @@ public class DFTInverse {
      */
     public static double[] run(Complex[] transformed){
 
-        int size = transformed.length;
+        Complex[] data;
+        data = restoreData(transformed);
+
+        int size = data.length;
         Complex exp_degree, magnitude;
         double[] result = new double[size];
 
@@ -24,7 +51,7 @@ public class DFTInverse {
 
             for (int j = 0; j < size; j++) {
                 exp_degree = new Complex(0, 2 * PI * j * i / size);
-                magnitude = magnitude.add(transformed[j].mult(exp_degree.exp()));
+                magnitude = magnitude.add(data[j].mult(exp_degree.exp()));
             }
 
             result[i] = magnitude.re() / size;
