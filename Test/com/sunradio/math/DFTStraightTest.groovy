@@ -17,6 +17,7 @@ class DFTStraightTest extends GroovyTestCase {
 
     double[] buffer = new double[ITERATIONS]
     double[] result = new double[ITERATIONS]
+    DFTStraight dftStraight = new DFTStraight()
 
     //f(t) = sin(t)
     public void testSin() {
@@ -25,7 +26,8 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = sin(2 * PI * i / SPLIT)
 
-        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
+        dftStraight.run(buffer)
+        result = dftStraight.getAmplitudes()
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -43,7 +45,8 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = NUMBER * sin(2 * PI * i / SPLIT)
 
-        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
+        dftStraight.run(buffer)
+        result = dftStraight.getAmplitudes()
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -63,7 +66,8 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = sin(NUMBER * 2 * PI * i / SPLIT)
 
-        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
+        dftStraight.run(buffer)
+        result = dftStraight.getAmplitudes()
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)
@@ -83,7 +87,8 @@ class DFTStraightTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             buffer[i] = NUMBER*sin(2 * PI * i / SPLIT) + sin(NUMBER * 2 * PI * i / SPLIT)
 
-        result = DFTStraight.getAmplitudes(DFTStraight.run(buffer))
+        dftStraight.run(buffer)
+        result = dftStraight.getAmplitudes()
 
         int amount = 0
         for (int i = 0; i < meaningful; i++)

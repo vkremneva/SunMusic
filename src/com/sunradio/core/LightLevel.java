@@ -16,7 +16,7 @@ public class LightLevel {
      * @param amount of how many measurement of light level we want
      * @return scaled to [0;1] array of light values
      */
-    public static double[] getFakeLightLevel(int amount) {
+    public static double[] getFakeLightLevel(int amount, Double minAmplitude, Double maxAmplitude) {
 
         //fake it 'till you make it
         Random r = new Random();
@@ -24,7 +24,7 @@ public class LightLevel {
         for (int i = 0; i < amount; i++)
             lightLevel[i] = r.nextInt();
 
-        return Scale.run(lightLevel, 0, 1);
+        return Scale.run(lightLevel, minAmplitude, maxAmplitude);
     }
 
     /**
@@ -33,7 +33,7 @@ public class LightLevel {
      * @param amount of how many measurement of light level we want
      * @return scaled to [0;1] array of light values
      */
-    static double[] getLightLevel(int amount) {
-        return getFakeLightLevel(amount);
+    static double[] getLightLevel(int amount, Double minAmplitude, Double maxAmplitude) {
+        return getFakeLightLevel(amount, minAmplitude, maxAmplitude);
     }
 }

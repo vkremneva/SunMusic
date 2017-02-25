@@ -1,6 +1,5 @@
 package com.sunradio.core;
 
-import com.external.Complex;
 import com.external.WavFile;
 import com.sunradio.math.AM;
 import com.sunradio.math.DFTInverse;
@@ -18,7 +17,7 @@ public class Main {
             final int FRAMES = 100;
             WavFile wavInput = WavFile.openWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\bells.wav"));
 
-            WavFile wavOutput = WavFile.newWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\new.wav"),
+            WavFile wavOutput = WavFile.newWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\new1.wav"),
                     wavInput.getNumChannels(), wavInput.getNumFrames(),
                     wavInput.getValidBits(), wavInput.getSampleRate());
 
@@ -28,22 +27,25 @@ public class Main {
             double[] lightLevel, modulated;
 
             int frames_read;
-            Complex[] transformedByDFT;
+            DFTStraight transformable;
+            transformable = new DFTStraight();
             do {
                 frames_read = wavInput.readFrames(buffer, FRAMES);
 
-                transformedByDFT = DFTStraight.run(buffer);
-                lightLevel = LightLevel.getLightLevel(indAmount);
+                transformable.run(buffer);
+                System.out.println(transformable.getMaxAmplitude()+" "+transformable.getMinAmplitude());
+                lightLevel = LightLevel.getLightLevel(indAmount,
+                        transformable.getMinAmplitude(), transformable.getMaxAmplitude());
 
-                modulated = AM.modulate(DFTStraight.getAmplitudes(transformedByDFT), lightLevel);
-                transformedByDFT = AM.applyModulationToComplex(transformedByDFT, modulated);
+                modulated = AM.modulate(transformable.getAmplitudes(), lightLevel);
+                transformable.setData(AM.applyModulationToComplex(transformable.getData(), modulated));
 
-                buffer = DFTInverse.run(transformedByDFT);
+                buffer = DFTInverse.run(transformable.getData());
 
                 wavOutput.writeFrames(buffer, FRAMES);
             } while (frames_read != 0);
 
-            wavInput.close();
+            wavInput.close(); wavOutput.close();
 
         } catch (Exception e) {
             System.err.println(e.toString());

@@ -20,7 +20,7 @@ public class AM {
      * @throws IllegalArgumentException if amount of conditions is less than amount of values
      */
     public static double[] modulate(double[] values, double[] conditions) {
-        return modulate(values, conditions, 1.0); //TODO: trial and error
+        return modulate(values, conditions, 100.0); //TODO: trial and error
     }
 
     /**
