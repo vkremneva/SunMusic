@@ -34,7 +34,6 @@ class DFTInverseTest extends GroovyTestCase {
 
     //f(t) = NUMBER*sin(t) + sin(Number*t)
     public void testTwoSin() throws IllegalArgumentException {
-        //TODO: fix those restrictions
         if ((NUMBER > SPLIT) || (NUMBER < SPLIT / 2))
             throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period")
 
