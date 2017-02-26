@@ -20,6 +20,10 @@ public class Scale {
 
         int size = arr.length;
         if (size < 1) throw new IllegalArgumentException("Array of the values cannot be empty");
+        if (from > to) {
+            double temp = from;
+            from = to; to = temp;
+        }
 
         double maxLevel = arr[0].doubleValue();
         double minLevel = arr[0].doubleValue();
