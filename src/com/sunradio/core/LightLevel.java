@@ -2,7 +2,7 @@ package com.sunradio.core;
 
 import com.sunradio.math.Scale;
 
-import java.util.Random;
+import static java.lang.Math.*;
 
 /**
  * LightLevel describes how we get an array of data with current light level
@@ -19,10 +19,10 @@ public class LightLevel {
     public static double[] getFakeLightLevel(int amount, Double minAmplitude, Double maxAmplitude) {
 
         //fake it 'till you make it
-        Random r = new Random();
         Integer[] lightLevel = new Integer[amount];
         for (int i = 0; i < amount; i++)
-            lightLevel[i] = r.nextInt();
+            lightLevel[i] = (int)(sin(2 * PI * i / 100)*1000); //for smoothness
+
 
         return Scale.run(lightLevel, minAmplitude, maxAmplitude);
     }
