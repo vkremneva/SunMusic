@@ -11,7 +11,7 @@ import com.external.Complex;
 public class AM {
 
     /**
-     * Modulate values according to conditions with the coefficient of modulation 1.0.
+     * Modulate values according to conditions with the coefficient of modulation -0.65.
      * Assume 'values' as amplitude values therefore perform an Amplitude Modulation.
      *
      * @param values an array with amplitude values to modulate
@@ -20,7 +20,7 @@ public class AM {
      * @throws IllegalArgumentException if amount of conditions is less than amount of values
      */
     public static double[] modulate(double[] values, double[] conditions) {
-        return modulate(values, conditions, 1.0);
+        return modulate(values, conditions, -0.65);
     }
 
     /**
