@@ -1,9 +1,8 @@
 package com.sunradio.math;
 
-import org.jetbrains.annotations.Contract;
-
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
+import static java.lang.Math.abs;
 
 /**
  * Filter functions
@@ -80,5 +79,26 @@ public class Filter {
             result[i] = amplitudes[i] * windowFunc[i];
         }
         return result;
+    }
+
+    /**
+     * Remove noise from amplitudes array
+     *
+     * @param toDenoise array to remove noise from
+     * @return sort of clean array
+     */
+    public static double[] denoise(double[] toDenoise) {
+        final double DENOISE_COEFF = 0.1; //got it by trial and error
+        double maxAmplitude, eps;
+
+        maxAmplitude = toDenoise[0];
+        for (double val: toDenoise)
+            if(val > maxAmplitude) maxAmplitude = val;
+
+        eps = maxAmplitude * DENOISE_COEFF;
+        for (int i = 0; i < toDenoise.length; i++)
+            if (abs(toDenoise[i]) < eps) toDenoise[i] = 0.0;
+
+        return toDenoise;
     }
 }
