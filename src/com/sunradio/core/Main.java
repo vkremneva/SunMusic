@@ -4,6 +4,7 @@ import com.external.WavFile;
 import com.sunradio.math.AM;
 import com.sunradio.math.DFTInverse;
 import com.sunradio.math.DFTStraight;
+import com.sunradio.math.Window;
 
 import java.io.File;
 
@@ -40,6 +41,7 @@ public class Main {
                 transformable.setData(AM.applyModulationToComplex(transformable.getData(), modulated));
 
                 buffer = DFTInverse.run(transformable.getData());
+                buffer = Window.apply(buffer, Window.BlackmanNuttall(indAmount));
 
                 wavOutput.writeFrames(buffer, FRAMES);
             } while (frames_read != 0);
