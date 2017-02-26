@@ -17,7 +17,7 @@ public class DFTStraight {
     private Complex[] data; //Complex data
     private double maxAmplitude; //maximum value of real amplitude in 'data' array
     private double minAmplitude; //minimum value of real amplitude in 'data' array
-    private int size; //size of 'data' array TODO: length
+    private int size; //size of 'data' array
     private boolean isTransformed; //flag whether was 'data' transformed by DFT or not
 
     public DFTStraight() {
@@ -65,9 +65,6 @@ public class DFTStraight {
 
         data = new Complex[size];
         data = Arrays.copyOf(dataToCut, size);
-       /* for (int i = 0; i < size; i++) {
-            data[i] = dataToCut[i];
-        }*/
     }
 
     /** Run transform with search of max and min value of amplitude.
@@ -82,7 +79,6 @@ public class DFTStraight {
         Double realAmplitude;
         Complex cBuffer, expDegree, tempData[];
         tempData = new Complex[size];
-
 
         if (size == 0) throw new IllegalArgumentException("Size of a buffer cannot be < 1.\n size = " + size);
 
@@ -115,7 +111,6 @@ public class DFTStraight {
      * @return a double array which contains amplitude values
      */
     public static double[] getAmplitudes(Complex[] complex) {
-
         int size = complex.length;
         double[] amplitudes = new double[size];
 
