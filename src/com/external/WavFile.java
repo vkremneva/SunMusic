@@ -1,4 +1,5 @@
 package com.external;
+
 /**
  * Wav file IO class
  * http://www.labbookpages.co.uk
@@ -68,6 +69,10 @@ public class WavFile
 	public long getFramesRemaining()
 	{
 		return numFrames - frameCounter;
+	}
+
+	public long getFrameCounter() {
+		return frameCounter;
 	}
 
 	public long getSampleRate()
@@ -622,6 +627,17 @@ public class WavFile
 
 		return numFramesToRead;
 	}
+
+	public int readFramesWithOverlap(double[] sampleBuffer, int numFramesToRead, int overlap) throws IOException, WavFileException
+	{
+		numFramesToRead = readFrames(sampleBuffer, 0, numFramesToRead);
+
+		long coeff = frameCounter * overlap / numFramesToRead - overlap + 1;
+		frameCounter = coeff * numFramesToRead / overlap;
+
+		return numFramesToRead;
+	}
+
 
 	public int writeFrames(double[] sampleBuffer, int numFramesToWrite) throws IOException, WavFileException
 	{

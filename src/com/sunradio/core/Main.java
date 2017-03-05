@@ -1,8 +1,6 @@
 package com.sunradio.core;
 
 import com.external.WavFile;
-import com.sunradio.math.AM;
-import com.sunradio.math.DFTInverse;
 import com.sunradio.math.DFTStraight;
 import com.sunradio.math.Filter;
 
@@ -15,49 +13,69 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            final int FRAMES = 100;
             WavFile wavInput = WavFile.openWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\launch.wav"));
 
             WavFile wavOutput = WavFile.newWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\new1.wav"),
                     wavInput.getNumChannels(), wavInput.getNumFrames(),
                     wavInput.getValidBits(), wavInput.getSampleRate());
 
+            final int FRAMES = 2048;
+            final int OVERLAP = 16;
             int numChannels = wavInput.getNumChannels();
-            int indAmount = FRAMES * numChannels;
-            double[] buffer = new double[indAmount];
+            int bufferIndAmount = FRAMES * numChannels;
+            int offset = FRAMES / OVERLAP;
+            int outputBufferIndAmount = bufferIndAmount + offset;
+            long wholeIndAmount = wavInput.getNumFrames() * numChannels;
+            double[] buffer = new double[bufferIndAmount];
+            double[] outputBuffer = new double[outputBufferIndAmount];
             double[] lightLevel, modulated;
 
             int frames_read;
             DFTStraight transformable;
             transformable = new DFTStraight();
             do {
-                //read next 'FRAMES' into buffer
-                frames_read = wavInput.readFrames(buffer, FRAMES);
+                //read next 'FRAMES' into buffer -- amplitudes(t)
+                frames_read = wavInput.readFramesWithOverlap(buffer, FRAMES, OVERLAP);
+                for (int i = 0; i < OVERLAP; i++) {
+                    //todo: test edges
+                    //apply window filter. first and last 'offset' goes without filter
+                    if ((wavInput.getFrameCounter() > offset) ||
+                            (wavInput.getFrameCounter() < wholeIndAmount - offset)) {
+                        buffer = Filter.apply(buffer, Filter.BlackmanNuttall(bufferIndAmount));
+                    }
 
-                //apply filter to soften the edges
-                buffer = Filter.apply(buffer, Filter.BlackmanNuttall(indAmount));
+                    //run Fourier transform
+                    transformable.run(buffer);
 
-                //run Fourier transform
-                transformable.run(buffer);
+                    //get current level of light
+                    //todo: mb return just average value
+                    //lightLevel = LightLevel.getLightLevel(buffer);
 
-                //get current level of light
-                lightLevel = LightLevel.getLightLevel(transformable.getSize(),
-                        transformable.getMinAmplitude(), transformable.getMaxAmplitude());
+                    //todo: tone modulation
 
-                //apply amplitude modulation
-                modulated = AM.modulate(transformable.getAmplitudes(), lightLevel);
+                    //correct amplitudes(t) according to the light level
+                    //buffer = AM.modulate(buffer, lightLevel);
 
-                //set modulated data to 'transformable'
-                transformable.setData(AM.applyModulationToComplex(transformable.getData(), modulated));
+                    //run inverse Fourier transform
+                    //buffer = DFTInverse.run(transformable.getData());
 
-                //run inverse Fourier transform
-                buffer = DFTInverse.run(transformable.getData());
+                    //todo: output window filter: maybe expand denoise
 
-                //filter the noise
-                buffer = Filter.denoise(buffer);
+                    for (int j = 0; j < bufferIndAmount; j++)
+                            outputBuffer[j + i] += buffer[j]; // todo: "+"?
+
+                    //read next 'FRAMES' into buffer -- amplitudes(t)
+                    frames_read = wavInput.readFramesWithOverlap(buffer, FRAMES, OVERLAP);
+                }
 
                 //write data to new .waw file
-                wavOutput.writeFrames(buffer, FRAMES);
+                wavOutput.writeFrames(outputBuffer, FRAMES);
+
+                //todo: test move
+                System.arraycopy(outputBuffer, offset, outputBuffer, 0, bufferIndAmount);
+                for (int i = outputBufferIndAmount; i > offset; i--)
+                    outputBuffer[i] = 0.0;
+
             } while (frames_read != 0);
 
             wavInput.close(); wavOutput.close();

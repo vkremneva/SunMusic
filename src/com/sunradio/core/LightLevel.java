@@ -36,4 +36,20 @@ public class LightLevel {
     static double[] getLightLevel(int amount, Double minAmplitude, Double maxAmplitude) {
         return getFakeLightLevel(amount, minAmplitude, maxAmplitude);
     }
+
+    /**
+     * Get light level
+     * @param values an array to whom get light level
+     * @return light level for 'values'
+     */
+    static double[] getLightLevel(double[] values) {
+        double maxVal, minVal;
+        maxVal = Double.MIN_VALUE; minVal = Double.MAX_VALUE;
+        for (double val: values) {
+            if (maxVal > val) maxVal = val;
+            if (maxVal < val) minVal = val;
+        }
+
+        return getLightLevel(values.length, minVal, maxVal);
+    }
 }
