@@ -3,6 +3,7 @@ package com.sunradio.core;
 import com.sunradio.math.Scale;
 
 import static java.lang.Math.*;
+import java.util.Random;
 
 /**
  * LightLevel describes how we get an array of data with current light level
@@ -51,5 +52,14 @@ public class LightLevel {
         }
 
         return getLightLevel(values.length, minVal, maxVal);
+    }
+
+    static private double getAverageFakeLevel() {
+        Random random = new Random();
+        return random.nextDouble();
+    }
+
+    static double getAverageLightLevel(double[] values) {
+        return getAverageFakeLevel();
     }
 }

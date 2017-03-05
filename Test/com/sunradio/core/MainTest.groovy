@@ -9,7 +9,7 @@ import com.sunradio.math.Filter
 class MainTest extends GroovyTestCase {
     final FRAMES = 100
     final EPS = 0.00001
-    DFTStraight transformable = new DFTStraight();
+    DFTStraight transformable = new DFTStraight()
 
     int numChannels, indAmount, framesRead
     double[] buffer, lightLevel, modulated, amplitudes
@@ -27,7 +27,7 @@ class MainTest extends GroovyTestCase {
                 //get initial amplitudes
                 framesRead = wavInput.readFrames(buffer, FRAMES)
                 for (int i = 0; i < indAmount; i++)
-                    if (buffer[i] != 0) flag = true;
+                    if (buffer[i] != 0) flag = true
 
                 if (flag) {
                     //Filter
@@ -77,7 +77,19 @@ class MainTest extends GroovyTestCase {
 
             wavInput.close()
         } catch (Exception e) {
-            System.err.println(e.toString());
+            System.err.println(e.toString())
         }
+    }
+
+    void testMove() {
+        int offset = 3
+        double[] before = [1, 2, 3, 4, 5, 6, 7]
+        double[] afterExpected = [4, 5, 6, 7, 0, 0, 0]
+        double[] afterActual
+
+        afterActual = Main.move(before, offset)
+
+        for (int i = 0; i < before.length; i++)
+            assertEquals(afterExpected[i], afterActual[i])
     }
 }

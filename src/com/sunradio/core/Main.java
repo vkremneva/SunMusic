@@ -11,6 +11,14 @@ import java.io.File;
  */
 public class Main {
 
+    public static double[] move(double[] data, int offset) {
+        double[] result = new double[data.length];
+
+        System.arraycopy(data, offset, result, 0, data.length - offset);
+
+        return result;
+    }
+
     public static void main(String[] args) {
         try {
             WavFile wavInput = WavFile.openWavFile(new File("C:\\Users\\Merveilleuse\\IdeaProjects\\SunRadio\\launch.wav"));
@@ -28,7 +36,8 @@ public class Main {
             long wholeIndAmount = wavInput.getNumFrames() * numChannels;
             double[] buffer = new double[bufferIndAmount];
             double[] outputBuffer = new double[outputBufferIndAmount];
-            double[] lightLevel, modulated, outputWindowFunction;
+            double[] modulated, outputWindowFunction;
+            double lightLevel;
 
             int frames_read;
             DFTStraight transformable;
@@ -48,8 +57,7 @@ public class Main {
                     transformable.run(buffer);
 
                     //get current level of light
-                    //todo: mb return just average value
-                    //lightLevel = LightLevel.getLightLevel(buffer);
+                    lightLevel = LightLevel.getAverageLightLevel(buffer);
 
                     //todo: tone modulation
 
@@ -73,10 +81,8 @@ public class Main {
                 //write data to new .waw file
                 wavOutput.writeFrames(outputBuffer, FRAMES);
 
-                //todo: test move
-                System.arraycopy(outputBuffer, offset, outputBuffer, 0, bufferIndAmount);
-                for (int i = outputBufferIndAmount; i > offset; i--)
-                    outputBuffer[i] = 0.0;
+                //move data for overlap
+                outputBuffer = move(outputBuffer, offset);
 
             } while (frames_read != 0);
 
