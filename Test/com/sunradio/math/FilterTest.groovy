@@ -24,4 +24,15 @@ class FilterTest extends GroovyTestCase {
         for (int i = 0; i < ITERATIONS; i++)
             assert applied[i] - (buffer[i] * winFunc[i]) < EPS
     }
+
+    void testGetOutputFilter() {
+        double[] inputWindowFunc = Filter.BlackmanNuttall(ITERATIONS)
+        double[] outputWindowFunc = Filter.getOutputWindowFunc(inputWindowFunc)
+        double sum = 0.0
+
+        for (int i = 0; i < ITERATIONS; i++)
+            sum += inputWindowFunc[i]*outputWindowFunc[i]
+
+        assertEquals(1.0, sum)
+    }
 }

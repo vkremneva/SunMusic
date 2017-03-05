@@ -28,7 +28,7 @@ public class Main {
             long wholeIndAmount = wavInput.getNumFrames() * numChannels;
             double[] buffer = new double[bufferIndAmount];
             double[] outputBuffer = new double[outputBufferIndAmount];
-            double[] lightLevel, modulated;
+            double[] lightLevel, modulated, outputWindowFunction;
 
             int frames_read;
             DFTStraight transformable;
@@ -59,7 +59,9 @@ public class Main {
                     //run inverse Fourier transform
                     //buffer = DFTInverse.run(transformable.getData());
 
-                    //todo: output window filter: maybe expand denoise
+                    //apply output window function
+                    outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(bufferIndAmount));
+                    buffer = Filter.apply(buffer, outputWindowFunction);
 
                     for (int j = 0; j < bufferIndAmount; j++)
                             outputBuffer[j + i] += buffer[j]; // todo: "+"?

@@ -1,8 +1,6 @@
 package com.sunradio.math;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.abs;
+import static java.lang.Math.*;
 
 /**
  * Filter functions
@@ -101,4 +99,26 @@ public class Filter {
 
         return toDenoise;
     }
+
+    /**
+     * Get function to filter output data before writing to file
+     *
+     * @param inputWindowFunc function used to filter input data
+     * @return function to filter output data
+     */
+    public static double[] getOutputWindowFunc(double[] inputWindowFunc) {
+        double[] outputWindowFunc = new double[inputWindowFunc.length];
+        double sum = 0.0;
+
+        for (double val: inputWindowFunc)
+            sum += val * val;
+
+        for (int i = 0; i < outputWindowFunc.length; i++)
+            outputWindowFunc[i] = inputWindowFunc[i] / sum;
+
+        return outputWindowFunc;
+    }
 }
+
+
+
