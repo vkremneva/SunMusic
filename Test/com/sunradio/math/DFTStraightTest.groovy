@@ -14,7 +14,7 @@ class DFTStraightTest extends GroovyTestCase {
     DFTStraight dftStraight = new DFTStraight()
 
     //f(t) = sin(t)
-    public void testSin() {
+    void testSin() {
 
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
@@ -23,7 +23,7 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0, size = dftStraight.getSize();
+        int amount = 0, size = dftStraight.getSize()
         for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
@@ -33,7 +33,7 @@ class DFTStraightTest extends GroovyTestCase {
 
     //f(t) = NUMBER*sin(t)
     //Test passes with any number
-    public void testConstMultSin() {
+    void testConstMultSin() {
 
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
@@ -42,7 +42,7 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0, size = dftStraight.getSize();
+        int amount = 0, size = dftStraight.getSize()
         for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
@@ -51,10 +51,10 @@ class DFTStraightTest extends GroovyTestCase {
     }
 
     //f(t) = sin(NUMBER*t)
-    public void testSinMultConst() throws IllegalArgumentException{
+    void testSinMultConst() throws IllegalArgumentException{
 
         if ((NUMBER > SPLIT) || (NUMBER < SPLIT / 2))
-            throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period");
+            throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period")
 
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
@@ -63,7 +63,7 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0, size = dftStraight.getSize();
+        int amount = 0, size = dftStraight.getSize()
         for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
@@ -72,10 +72,10 @@ class DFTStraightTest extends GroovyTestCase {
     }
 
     //f(t) = NUMBER*sin(t) + sin(Number*t)
-    public void testTwoSinuses() {
+    void testTwoSinuses() {
 
         if ((NUMBER > SPLIT) || (NUMBER < SPLIT / 2))
-            throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period");
+            throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period")
 
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
@@ -84,12 +84,64 @@ class DFTStraightTest extends GroovyTestCase {
         dftStraight.run(buffer)
         result = dftStraight.getAmplitudes()
 
-        int amount = 0, size = dftStraight.getSize();
+        int amount = 0, size = dftStraight.getSize()
         for (int i = 0; i < size; i++)
             if (result[i] > EPS)
                 amount++
 
         assertEquals(2, amount)
+    }
+
+    void testApplyNewAmplitudes() {
+        double[] modulation
+        DFTStraight dftStraightApplied = new DFTStraight()
+
+        for (int i = 0; i < ITERATIONS; i++)
+            buffer[i] = sin(2 * PI * i / SPLIT)
+
+        dftStraight.run(buffer)
+
+        modulation = new double[dftStraight.size]
+        Random random = new Random()
+        for (int i = 0; i < dftStraight.size; i++)
+            modulation[i] = abs(random.nextDouble())
+
+        dftStraightApplied.setData(dftStraight.getData())
+        dftStraightApplied.applyNewAmplitudes(modulation)
+
+        double oldPhase, newPhase
+        for (int i = 0; i < dftStraight.size; i++) {
+            oldPhase = dftStraight.getPhase(i)
+            newPhase = dftStraightApplied.getPhase(i)
+
+            assert abs(oldPhase - newPhase)  < EPS
+        }
+    }
+
+    void testApplyNewPhases() {
+        double[] modulation
+        DFTStraight dftStraightApplied = new DFTStraight()
+
+        for (int i = 0; i < ITERATIONS; i++)
+            buffer[i] = sin(2 * PI * i / SPLIT)
+
+        dftStraight.run(buffer)
+
+        modulation = new double[dftStraight.size]
+        Random random = new Random()
+        for (int i = 0; i < dftStraight.size; i++)
+            modulation[i] = abs(random.nextDouble())
+
+        dftStraightApplied.setData(dftStraight.getData())
+        dftStraightApplied.applyNewPhases(modulation)
+
+        double oldAmplitude, newAmplitude
+        for (int i = 0; i < dftStraight.size; i++) {
+            oldAmplitude = dftStraight.getAmplitude(i)
+            newAmplitude = dftStraightApplied.getAmplitude(i)
+
+            assert abs(oldAmplitude - newAmplitude) < EPS
+       }
     }
 }
 

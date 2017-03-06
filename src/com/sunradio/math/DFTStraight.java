@@ -1,11 +1,8 @@
 package com.sunradio.math;
 
 import com.external.Complex;
-
 import java.util.Arrays;
-
-import static java.lang.Math.PI;
-import static java.lang.Math.max;
+import static java.lang.Math.*;
 
 /**
  * Straight discrete Fourier transform.
@@ -47,8 +44,61 @@ public class DFTStraight {
         return size;
     }
 
+    /** Get a double phases from 'data' array.
+     *
+     * @return a double array which contains phase values
+     */
+    public double[] getPhases() {
+        double[] result = new double[size];
+        for (int i = 0; i < size; i++)
+            result[i] = atan(data[i].im() / data[i].re());
+
+        return result;
+    }
+
+    /** Get a phase value on specific harmonic
+     *
+     * @param n frequency value of harmonic
+     * @return double value of phase of harmonic
+     */
+    public double getPhase(int n) {
+        return atan(data[n].im() / data[n].re());
+    }
+
+    /** Get a double amplitudes from 'data' array.
+     *
+     * @return a double array which contains amplitude values
+     */
+    public double[] getAmplitudes() {
+        double[] amplitudes = new double[size];
+
+        for (int i = 0; i < size; i++)
+            amplitudes[i] = data[i].abs() / (size * 2 - 1); // ' *2-1' due to cutting in half
+
+        return amplitudes;
+    }
+
+    /** Get an amplitude value on specific harmonic
+     *
+     * @param n frequency value of harmonic
+     * @return double value of amplitude of harmonic
+     */
+    public double getAmplitude(int n) {
+        return data[n].abs() / (size * 2 - 1);
+        // '*2 - 1' due to cutting in half
+    }
+
     public void setData(Complex[] newData) {
-        data = newData;
+        size = newData.length;
+        data = Arrays.copyOf(newData, size);
+
+        double max, min;
+        max = Double.MIN_VALUE; min = Double.MAX_VALUE;
+        for (int i = 0; i < size; i++) {
+            if (this.getAmplitude(i) > max) max = this.getAmplitude(i);
+            if (this.getAmplitude(i) < min) min = this.getAmplitude(i);
+        }
+        maxAmplitude = max; minAmplitude = min;
     }
 
     /**
@@ -105,31 +155,49 @@ public class DFTStraight {
         return data;
     }
 
-    /** Get a double amplitudes from some Complex array.
+    /**
+     * Change phase values in 'data' without changing amplitudes
      *
-     * @param complex a complex array
-     * @return a double array which contains amplitude values
+     * @param newPhases an array of phase values we want to apply
      */
-    public static double[] getAmplitudes(Complex[] complex) {
-        int size = complex.length;
-        double[] amplitudes = new double[size];
+    void applyNewPhases(double[] newPhases) {
+        double a, b, allowance;
+        for (int i = 0; i < size; i++) {
+            if (data[i].re() > 0) allowance = 0;
+            else if (data[i].im() > 0) allowance = -PI;
+            else allowance = PI;
 
-        for (int i = 0; i < size; i++)
-            amplitudes[i] = complex[i].abs() / size;
+            a = data[i].abs() / sqrt(1 + pow(tan(newPhases[i] + allowance), 2.0));
+            b = a * tan(newPhases[i] + allowance);
 
-        return amplitudes;
+            //we get 'b' from equation for phase and 'a' from my condition:
+            //i want the real amplitudes be the same
+
+            data[i] = new Complex(a, b);
+        }
     }
 
-    /** Get a double amplitudes from 'data' array.
+    /**
+     * Change amplitude values in 'data' without changing phases
      *
-     * @return a double array which contains amplitude values
+     * @param newAmplitudes an array of amplitude values we want to apply
      */
-    public double[] getAmplitudes() {
-        double[] amplitudes = new double[size];
+     void applyNewAmplitudes(double[] newAmplitudes) {
+         int sign;
+         double a, b;
+         for (int i = 0; i < size; i++) {
+             if (this.getPhase(i) < 0) sign = -1;
+             else sign = 1;
+             b = pow(data[i].im(), 2.0) * pow(newAmplitudes[i], 2.0) * pow(size, 2.0);
+             b = b / (pow(data[i].re(), 2.0) + pow(data[i].im(), 2.0));
+             b = sqrt(b);
 
-        for (int i = 0; i < size; i++)
-            amplitudes[i] = data[i].abs() / size;
+             a = sign * sqrt(pow(newAmplitudes[i], 2.0) * pow(size, 2.0) - pow(b, 2.0));
 
-        return amplitudes;
-    }
+            //we get 'a' from equation for real amplitude and 'b' from my condition:
+            //i want the real phase be the same
+
+            data[i] = new Complex(a, b);
+         }
+     }
 }
