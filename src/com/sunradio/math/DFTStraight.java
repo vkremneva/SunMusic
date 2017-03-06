@@ -78,6 +78,21 @@ public class DFTStraight {
         return amplitudes;
     }
 
+    static double[] getPhases(Complex[] data) {
+        double[] phases = new double[data.length];
+        double allowance;
+        for (int i = 0; i < phases.length; i++) {
+
+            if (data[i].re() > 0) allowance = 0;
+            else if (data[i].im() > 0) allowance = PI;
+            else allowance = -PI;
+
+            phases[i] = allowance + atan(data[i].im() / data[i].re());
+        }
+
+        return phases;
+    }
+
     /** Get an amplitude value on specific harmonic
      *
      * @param n frequency value of harmonic

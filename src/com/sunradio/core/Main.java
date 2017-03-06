@@ -31,21 +31,27 @@ public class Main {
             final int OVERLAP = 16;
             int numChannels = wavInput.getNumChannels();
             int bufferIndAmount = FRAMES * numChannels;
+            int overlapIndAmount = OVERLAP * numChannels;
             int offset = FRAMES / OVERLAP;
-            int outputBufferIndAmount = bufferIndAmount + offset;
+            int outputBufferIndAmount = bufferIndAmount + overlapIndAmount;
             long wholeIndAmount = wavInput.getNumFrames() * numChannels;
             double[] buffer = new double[bufferIndAmount];
             double[] outputBuffer = new double[outputBufferIndAmount];
-            double[] modulated, outputWindowFunction;
+            double[] modulated, outputWindowFunction, prevPhases, currentPhases;
             double lightLevel;
 
             int frames_read;
             DFTStraight transformable;
             transformable = new DFTStraight();
+            prevPhases = new double[bufferIndAmount];
             do {
                 //read next 'FRAMES' into buffer -- amplitudes(t)
                 frames_read = wavInput.readFramesWithOverlap(buffer, FRAMES, OVERLAP);
-                for (int i = 0; i < OVERLAP; i++) {
+
+                //get current level of light
+                lightLevel = LightLevel.getAverageLightLevel(buffer);
+
+                for (int i = 0; i < overlapIndAmount; i++) {
                     //todo: test edges
                     //apply window filter. first and last 'offset' goes without filter
                     if ((wavInput.getFrameCounter() > offset) ||
@@ -55,9 +61,6 @@ public class Main {
 
                     //run Fourier transform
                     transformable.run(buffer);
-
-                    //get current level of light
-                    lightLevel = LightLevel.getAverageLightLevel(buffer);
 
                     //todo: tone modulation
 
@@ -82,7 +85,7 @@ public class Main {
                 wavOutput.writeFrames(outputBuffer, FRAMES);
 
                 //move data for overlap
-                outputBuffer = move(outputBuffer, offset);
+                outputBuffer = move(outputBuffer, overlapIndAmount);
 
             } while (frames_read != 0);
 
