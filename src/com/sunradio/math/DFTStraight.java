@@ -24,6 +24,14 @@ public class DFTStraight {
         isTransformed = false;
     }
 
+    public DFTStraight(int amount) {
+        maxAmplitude = 0.0;
+        minAmplitude = 0.0;
+        size = amount;
+        isTransformed = false;
+        data = new Complex[amount];
+    }
+
     public double getMaxAmplitude() {
         return maxAmplitude;
     }
@@ -49,11 +57,18 @@ public class DFTStraight {
      * @return a double array which contains phase values
      */
     public double[] getPhases() {
-        double[] result = new double[size];
-        for (int i = 0; i < size; i++)
-            result[i] = atan(data[i].im() / data[i].re());
+        double[] phases = new double[size];
+        double allowance;
+        for (int i = 0; i < size; i++) {
 
-        return result;
+            if (data[i].re() > 0) allowance = 0;
+            else if (data[i].im() > 0) allowance = PI;
+            else allowance = -PI;
+
+            phases[i] = allowance + atan(data[i].im() / data[i].re());
+        }
+
+        return phases;
     }
 
     /** Get a phase value on specific harmonic
@@ -73,7 +88,16 @@ public class DFTStraight {
         double[] amplitudes = new double[size];
 
         for (int i = 0; i < size; i++)
-            amplitudes[i] = data[i].abs() / (size * 2 - 1); // ' *2-1' due to cutting in half
+            amplitudes[i] = data[i].abs() / ((size - 1) * 2); // '-1)*2' due to cutting in half
+
+        return amplitudes;
+    }
+
+    static double[] getAmplitudes(Complex[] data) {
+        double[] amplitudes = new double[data.length];
+
+        for (int i = 0; i < data.length; i++)
+            amplitudes[i] = data[i].abs() / ((data.length - 1) * 2); // '-1)*2' due to cutting in half
 
         return amplitudes;
     }
@@ -99,8 +123,8 @@ public class DFTStraight {
      * @return double value of amplitude of harmonic
      */
     public double getAmplitude(int n) {
-        return data[n].abs() / (size * 2 - 1);
-        // '*2 - 1' due to cutting in half
+        return data[n].abs() / ((size - 1) * 2);
+        // '-1)*2' due to cutting in half
     }
 
     public void setData(Complex[] newData) {
@@ -197,7 +221,7 @@ public class DFTStraight {
      *
      * @param newAmplitudes an array of amplitude values we want to apply
      */
-     void applyNewAmplitudes(double[] newAmplitudes) {
+    void applyNewAmplitudes(double[] newAmplitudes) {
          int sign;
          double a, b;
          for (int i = 0; i < size; i++) {
@@ -214,5 +238,5 @@ public class DFTStraight {
 
             data[i] = new Complex(a, b);
          }
-     }
+    }
 }

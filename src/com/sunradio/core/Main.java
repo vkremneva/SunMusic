@@ -3,6 +3,7 @@ package com.sunradio.core;
 import com.external.WavFile;
 import com.sunradio.math.DFTStraight;
 import com.sunradio.math.Filter;
+import com.sunradio.math.DFTInverse;
 
 import java.io.File;
 
@@ -11,6 +12,12 @@ import java.io.File;
  */
 public class Main {
 
+    /**
+     *  Move data to the left with filling with 0
+     * @param data data to move
+     * @param offset amount of steps to move
+     * @return array with nulls in the end and 'data' values moved on offset
+     */
     public static double[] move(double[] data, int offset) {
         double[] result = new double[data.length];
 
@@ -68,7 +75,7 @@ public class Main {
                     //buffer = AM.modulate(buffer, lightLevel);
 
                     //run inverse Fourier transform
-                    //buffer = DFTInverse.run(transformable.getData());
+                    buffer = DFTInverse.run(transformable.getData());
 
                     //apply output window function
                     outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(bufferIndAmount));
