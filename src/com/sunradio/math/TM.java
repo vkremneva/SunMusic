@@ -8,32 +8,40 @@ import com.external.Complex;
  * @author V.Kremneva
  */
 public class TM {
-    private static double[] getVelocity(double[] previousPhases, double[] currentPhases) {
-        double[] result = new double[previousPhases.length];
 
-        for (int i = 0; i < previousPhases.length; i++)
-            result[i] = currentPhases[i] - previousPhases[i];
+    /**
+     *  Stretch data in N times
+     * @param previousData data from previous iteration
+     * @param currentData data from current iteration
+     * @param coefficient in how many times to stretch
+     * @return stretched data
+     */
+    public static DFTStraight stretch(Complex[] previousData, Complex[] currentData, int coefficient) {
 
+        int size = previousData.length;
+        int newSize = size * coefficient;
+        DFTStraight result = new DFTStraight(newSize);
+        double[] currentPhases = DFTStraight.getPhases(currentData);
+        double[] previousPhases = DFTStraight.getPhases(previousData);
+        double[] currentAmplitude = DFTStraight.getAmplitudes(currentData);
+        double[] previousAmplitude = DFTStraight.getAmplitudes(previousData);
+        double[] newPhases = new double[newSize];
+        double[] newAmplitudes = new double[newSize];
+        double[] velocity = new double[size];
 
-        return result;
-    }
+        for (int i = 0; i < size; i++)
+            velocity[i] = currentPhases[i] - previousPhases[i];
 
-    public static DFTStraight modulate(double[] prevPhases, Complex[] data, double coefficient) {
-        DFTStraight result = new DFTStraight();
-        double[] currentPhases = DFTStraight.getPhases(data);
-        result.setData(data);
-        //todo: get velocity
-        double[] velocity;
-        velocity = getVelocity(prevPhases, currentPhases);
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < coefficient; j++)
+                newPhases[i + j] = currentPhases[i] + velocity[i];
 
-        //todo: add to prev phase
-        double[] newPhases = new double[prevPhases.length];
-        for (int i = 0; i < prevPhases.length; i++)
-            newPhases[i] = currentPhases[i] + velocity[i];
         result.applyNewPhases(newPhases);
 
-        //todo: interpolate amplitudes
-        double[] newAmplitudes = new double[prevPhases.length];
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < coefficient; j++)
+                newAmplitudes[i + j] = Interpolation.linearByX(0, previousAmplitude[i], coefficient, currentAmplitude[i], j);
+
         result.applyNewAmplitudes(newAmplitudes);
 
         return result;
