@@ -24,14 +24,6 @@ public class DFTStraight {
         isTransformed = false;
     }
 
-    public DFTStraight(int amount) {
-        maxAmplitude = 0.0;
-        minAmplitude = 0.0;
-        size = amount;
-        isTransformed = false;
-        data = new Complex[amount];
-    }
-
     public double getMaxAmplitude() {
         return maxAmplitude;
     }
@@ -77,7 +69,21 @@ public class DFTStraight {
      * @return double value of phase of harmonic
      */
     public double getPhase(int n) {
-        return atan(data[n].im() / data[n].re());
+        double allowance;
+        if (data[n].re() > 0) allowance = 0;
+        else if (data[n].im() > 0) allowance = PI;
+        else allowance = -PI;
+
+        return allowance + atan(data[n].im() / data[n].re());
+    }
+
+    public static double getPhase(Complex[] data, int n) {
+        double allowance;
+        if (data[n].re() > 0) allowance = 0;
+        else if (data[n].im() > 0) allowance = PI;
+        else allowance = -PI;
+
+        return allowance + atan(data[n].im() / data[n].re());
     }
 
     /** Get a double amplitudes from 'data' array.
@@ -216,6 +222,25 @@ public class DFTStraight {
         }
     }
 
+    static Complex[] applyNewPhases(double[] newPhases, Complex[] oldData) {
+        double a, b, allowance;
+        Complex[] result = new Complex[newPhases.length];
+        for (int i = 0; i < newPhases.length; i++) {
+            if (oldData[i].re() > 0) allowance = 0;
+            else if (oldData[i].im() > 0) allowance = -PI;
+            else allowance = PI;
+
+            a = oldData[i].abs() / sqrt(1 + pow(tan(newPhases[i] + allowance), 2.0));
+            b = a * tan(newPhases[i] + allowance);
+
+            //we get 'b' from equation for phase and 'a' from my condition:
+            //i want the real amplitudes be the same
+
+            result[i] = new Complex(a, b);
+        }
+        return result;
+    }
+
     /**
      * Change amplitude values in 'data' without changing phases
      *
@@ -238,5 +263,27 @@ public class DFTStraight {
 
             data[i] = new Complex(a, b);
          }
+    }
+
+    static Complex[] applyNewAmplitudes(double[] newAmplitudes, Complex[] oldData) {
+        int sign;
+        double a, b;
+        Complex[] result = new Complex[newAmplitudes.length];
+        for (int i = 0; i < newAmplitudes.length; i++) {
+            if (getPhase(oldData, i) < 0) sign = -1;
+            else sign = 1;
+            b = pow(oldData[i].im(), 2.0) * pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0);
+            b = b / (pow(oldData[i].re(), 2.0) + pow(oldData[i].im(), 2.0));
+            b = sqrt(b);
+
+            a = sign * sqrt(pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0) - pow(b, 2.0));
+
+            //we get 'a' from equation for real amplitude and 'b' from my condition:
+            //i want the real phase be the same
+
+            result[i] = new Complex(a, b);
+        }
+
+        return result;
     }
 }

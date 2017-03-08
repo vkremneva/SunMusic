@@ -54,12 +54,12 @@ public class LightLevel {
         return getLightLevel(values.length, minVal, maxVal);
     }
 
-    private static double getAverageFakeLevel() {
+    private static int getAverageFakeLevel() {
         Random random = new Random();
-        return random.nextDouble();
+        return random.nextInt();
     }
 
-    static double getAverageLightLevel(double[] values) {
+    static int getAverageLightLevel(double[] values) {
         return getAverageFakeLevel();
     }
 }

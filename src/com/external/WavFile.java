@@ -1,5 +1,11 @@
 package com.external;
 
+import java.io.*;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+
+
 /**
  * Wav file IO class
  * http://www.labbookpages.co.uk
@@ -11,12 +17,6 @@ package com.external;
  * @author A.Greensted
  * @version 1.0
  */
-
-import java.io.*;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-
 public class WavFile
 {
 	private enum IOState {READING, WRITING, CLOSED};
@@ -631,7 +631,6 @@ public class WavFile
 	public int readFramesWithOverlap(double[] sampleBuffer, int numFramesToRead, int overlap) throws IOException, WavFileException
 	{
 		numFramesToRead = readFrames(sampleBuffer, 0, numFramesToRead);
-
 		long coeff = frameCounter * overlap / numFramesToRead - overlap + 1;
 		frameCounter = coeff * numFramesToRead / overlap;
 
