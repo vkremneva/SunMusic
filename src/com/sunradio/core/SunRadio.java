@@ -28,16 +28,20 @@ public class SunRadio {
     private int offset; //amount of new frames read in each step of cycle
     private int outputBufferIndAmount; //amount of indexes in am array to write
     private long wholeIndAmount; //amount of pieces to read in whole file
+    private String outputPath; //path to save output file
 
     /**
      * Open file and set some fields depending on it
      *
-     * @param inputPath path to file to open
+     * @param args is an array with paths to input and output files
      */
-    private void openWavFile(String inputPath) {
+    private void openWavFile(String[] args) {
+        if (args.length < 2) throw new IllegalArgumentException("As the arguments of the program " +
+                "input path and output path are needed.");
+
         try {
 
-            wavInput = WavFile.openWavFile(new File(inputPath));
+            wavInput = WavFile.openWavFile(new File(args[0]));
 
         } catch (Exception e) {
             System.err.println(e.toString());
@@ -49,28 +53,71 @@ public class SunRadio {
         offset = FRAMES / OVERLAP;
         outputBufferIndAmount = bufferIndAmount + overlapIndAmount;
         wholeIndAmount = wavInput.getNumFrames() * numChannels;
+        outputPath = args[1];
     }
 
     /**
      * Create empty output file like input file but stretched
      *
      * @param outputPath path where to create output file
+     * @param stretch in how many times we want to stretch
+     * @return empty stretched wav file
      */
-    private void createStretchedOutputFile(String outputPath, int stretch) {
+    private WavFile createStretchedOutputFile(String outputPath, int stretch) {
         try {
-
-            wavOutput = WavFile.newWavFile(new File(outputPath),
+            return WavFile.newWavFile(new File(outputPath),
                     wavInput.getNumChannels(), wavInput.getNumFrames() * stretch,
                     wavInput.getValidBits(), wavInput.getSampleRate());
 
         } catch (Exception e) {
             System.err.println(e.toString());
         }
+
+        return new WavFile();
     }
 
+    /**
+     * Create 'wavOutput' file as the sum of another wav files
+     * @param outputPath initial path to another wav files
+     * @param amount amount and in thi case step between wav files
+     */
+    private void assembleWavFiles(String outputPath, int amount) { //todo: universalize
+        int framesAmount = 0;
+        double[] buffer;
+        WavFile temp;
+        try {
+            for (int i = 0; i < amount; i++) {
+                temp = WavFile.openWavFile(new File(outputPath + i));
+                framesAmount += temp.getFrameCounter();
+                temp.close();
+            }
+
+            wavOutput = WavFile.newWavFile(new File(outputPath), wavInput.getNumChannels(),
+                    framesAmount, wavInput.getValidBits(), wavInput.getSampleRate());
+
+            buffer = new double[framesAmount];
+            for (int i = 0; i < amount; i++) {
+                temp = WavFile.openWavFile(new File(outputPath + i));
+                temp.readFrames(buffer, (int)temp.getNumFrames()); //todo: correct for large frame amounts
+
+                wavOutput.writeFrames(buffer, (int)temp.getNumFrames());
+
+                temp.close();
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
+    }
+
+    /**
+     * Run the process of modulation and play the result
+     */
     private void run() {
-        double[] buffer = new double[bufferIndAmount];
-        double[] outputBuffer = new double[outputBufferIndAmount];
+        WavFile stretchedOutputFile;
+        double[] buffer = new double[bufferIndAmount * 2];
+        double[] secondaryBuffer = new double[bufferIndAmount];
+        double[] outputBuffer;
         double[] outputWindowFunction;
         int lightLevel, frames_read;
         DFTStraight transformable;
@@ -78,63 +125,78 @@ public class SunRadio {
 
         transformable = new DFTStraight();
         toneModulation = new ToneModulation(bufferIndAmount);
-
-        int counter = 0;
+        int count = 0;
         try {
-            do {
-                //read next 'FRAMES' into buffer -- amplitudes(t)
-                frames_read = wavInput.readFramesWithOverlap(buffer, FRAMES, OVERLAP);
+            frames_read = wavInput.readFrames(buffer, FRAMES);
 
-                //get current level of light
-                lightLevel = LightLevel.getAverageLightLevel(buffer);
+            if (frames_read != 0) {
+                do {
+                    //read next 'FRAMES' into buffer -- amplitudes(t)
+                    frames_read = wavInput.readFrames(buffer, FRAMES);
 
-                for (int i = 0; i < overlapIndAmount; i++) {
-                    //apply window filter. first and last 'offset' goes without filter
-                    if (!(wavInput.getFrameCounter() == offset) && !(wavInput.getFrameCounter() == (wholeIndAmount - offset))) {
-                        buffer = Filter.apply(buffer, Filter.BlackmanNuttall(bufferIndAmount));
+                    //get current level of light
+                    lightLevel = LightLevel.getAverageLightLevel(buffer);
+
+                    //stretching size of output buffer
+                    outputBufferIndAmount *= lightLevel;
+                    outputBuffer = new double[outputBufferIndAmount];
+
+                    for (int i = 0; i < overlapIndAmount; i++) {
+                        //get next 'FRAMES' from buffer to work with
+                        System.arraycopy(buffer, i * offset, secondaryBuffer, 0, bufferIndAmount);
+
+                        //apply window filter. first and last 'offset' goes without filter
+                        if (!(wavInput.getFrameCounter() == offset) && !(wavInput.getFrameCounter() == (wholeIndAmount - offset))) {
+                            secondaryBuffer = Filter.apply(buffer, Filter.BlackmanNuttall(bufferIndAmount));
+                        }
+
+                        //run Fourier transform
+                        transformable.run(secondaryBuffer);
+
+                        //stretch in 'light level' times
+                        toneModulation.setCurrentData(transformable);
+                        transformable.setData(toneModulation.stretch(lightLevel));
+
+                        //run inverse Fourier transform
+                        secondaryBuffer = DFTInverse.run(transformable.getData());
+
+                        //apply output window function
+                        outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(bufferIndAmount));
+                        secondaryBuffer = Filter.apply(secondaryBuffer, outputWindowFunction);
+
+                        //add data to output buffer
+                        for (int j = 0; j < bufferIndAmount; j++)
+                            outputBuffer[j + i] += secondaryBuffer[j];
+
+                        //move data for overlap
+                        outputBuffer = move(outputBuffer, overlapIndAmount);
                     }
 
-                    //run Fourier transform
-                    transformable.run(buffer);
+                    stretchedOutputFile = createStretchedOutputFile(outputPath + count, lightLevel);
 
-                    //stretch in 'light level' times
-                    toneModulation.setCurrentData(transformable);
-                    transformable.setData(toneModulation.stretch(lightLevel));
+                    //write data to new .waw file
+                    stretchedOutputFile.writeFrames(outputBuffer, FRAMES);
 
-                    //run inverse Fourier transform
-                    buffer = DFTInverse.run(transformable.getData());
+                    toneModulation.setPreviousData(transformable);
+                    count++;
+                } while (frames_read != 0);
 
-                    //apply output window function
-                    outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(bufferIndAmount));
-                    buffer = Filter.apply(buffer, outputWindowFunction);
+                //todo: assemble all wav files
+                assembleWavFiles(outputPath, count);
 
-                    for (int j = 0; j < bufferIndAmount; j++)
-                        outputBuffer[j + i] += buffer[j];
-
-                    //read next 'FRAMES' into buffer -- amplitudes(t)
-                    frames_read = wavInput.readFramesWithOverlap(buffer, FRAMES, OVERLAP);
-                }
-
-                //write data to new .waw file
-                wavOutput.writeFrames(outputBuffer, FRAMES);
-
-                //move data for overlap
-                outputBuffer = move(outputBuffer, overlapIndAmount);
-
-                toneModulation.setPreviousData(transformable);
-                counter++;
-            } while (frames_read != 0);
-
-            //todo: adjust volume
-            //todo: fasten velocity of playback
-            //play(outputPath);
-
+                //todo: adjust volume
+                //todo: fasten velocity of playback
+                //play(outputPath);
+            }
 
         } catch (Exception e) {
             System.err.println(e.toString());
         }
     }
 
+    /**
+     * Close input and output files
+     */
     private void closeFiles() {
         try {
 
@@ -175,13 +237,9 @@ public class SunRadio {
     }*/
 
     public static void main(String[] args) {
-
-       if (args.length < 2) throw new IllegalArgumentException("As the arguments of the program " +
-                "input path and output path are needed.");
-
         SunRadio radio = new SunRadio();
 
-        radio.openWavFile(args[0]);
+        radio.openWavFile(args);
 
         radio.run();
 

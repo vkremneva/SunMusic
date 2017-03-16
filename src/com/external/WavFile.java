@@ -51,7 +51,7 @@ public class WavFile
 	private long frameCounter;				// Current number of frames read or written
 
 	// Cannot instantiate WavFile directly, must either use newWavFile() or openWavFile()
-	private WavFile()
+	public WavFile()
 	{
 		buffer = new byte[BUFFER_SIZE];
 	}
@@ -627,16 +627,6 @@ public class WavFile
 
 		return numFramesToRead;
 	}
-
-	public int readFramesWithOverlap(double[] sampleBuffer, int numFramesToRead, int overlap) throws IOException, WavFileException
-	{
-		numFramesToRead = readFrames(sampleBuffer, 0, numFramesToRead);
-		long coeff = frameCounter * overlap / numFramesToRead - overlap + 1;
-		frameCounter = coeff * numFramesToRead / overlap;
-
-		return numFramesToRead;
-	}
-
 
 	public int writeFrames(double[] sampleBuffer, int numFramesToWrite) throws IOException, WavFileException
 	{
