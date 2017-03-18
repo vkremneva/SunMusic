@@ -124,22 +124,24 @@ public class SunRadio {
         ToneModulation toneModulation;
 
         transformable = new DFTStraight();
-        toneModulation = new ToneModulation(bufferIndAmount);
+        toneModulation = new ToneModulation(bufferIndAmount / 2 + 1);
+        //' / 2 + 1' due to cutting complex data in half when run DFT
         int count = 0;
         try {
+            //read first 'FRAMES' frames
             frames_read = wavInput.readFrames(buffer, FRAMES);
+
+            //get current level of light
+            lightLevel = LightLevel.getAverageLightLevel(buffer);
+
+            //stretching size of output buffer
+            outputBufferIndAmount *= lightLevel;
+            outputBuffer = new double[outputBufferIndAmount];
 
             if (frames_read != 0) {
                 do {
                     //read next 'FRAMES' into buffer -- amplitudes(t)
                     frames_read = wavInput.readFrames(buffer, FRAMES);
-
-                    //get current level of light
-                    lightLevel = LightLevel.getAverageLightLevel(buffer);
-
-                    //stretching size of output buffer
-                    outputBufferIndAmount *= lightLevel;
-                    outputBuffer = new double[outputBufferIndAmount];
 
                     for (int i = 0; i < overlapIndAmount; i++) {
                         //get next 'FRAMES' from buffer to work with
@@ -147,21 +149,22 @@ public class SunRadio {
 
                         //apply window filter. first and last 'offset' goes without filter
                         if (!(wavInput.getFrameCounter() == offset) && !(wavInput.getFrameCounter() == (wholeIndAmount - offset))) {
-                            secondaryBuffer = Filter.apply(buffer, Filter.BlackmanNuttall(bufferIndAmount));
+                            secondaryBuffer = Filter.apply(secondaryBuffer, Filter.BlackmanNuttall(secondaryBuffer.length));
                         }
 
                         //run Fourier transform
                         transformable.run(secondaryBuffer);
 
+                        if (count == 0)
+                            toneModulation.setPreviousData(transformable);
                         //stretch in 'light level' times
-                        toneModulation.setCurrentData(transformable);
-                        transformable.setData(toneModulation.stretch(lightLevel));
+                        transformable.setData(toneModulation.stretch(lightLevel, transformable.getData()));
 
                         //run inverse Fourier transform
                         secondaryBuffer = DFTInverse.run(transformable.getData());
 
                         //apply output window function
-                        outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(bufferIndAmount));
+                        outputWindowFunction = Filter.getOutputWindowFunc(Filter.BlackmanNuttall(secondaryBuffer.length));
                         secondaryBuffer = Filter.apply(secondaryBuffer, outputWindowFunction);
 
                         //add data to output buffer
@@ -181,7 +184,6 @@ public class SunRadio {
                     count++;
                 } while (frames_read != 0);
 
-                //todo: assemble all wav files
                 assembleWavFiles(outputPath, count);
 
                 //todo: adjust volume

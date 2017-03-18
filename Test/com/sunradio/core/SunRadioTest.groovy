@@ -7,22 +7,16 @@ import com.sunradio.math.DFTStraight
 import com.sunradio.math.Filter
 
 class SunRadioTest extends GroovyTestCase {
-    final FRAMES = 100
-    final EPS = 0.00001
-    DFTStraight transformable = new DFTStraight()
-
-    int numChannels, indAmount, framesRead
-    double[] buffer, lightLevel, modulated, amplitudes
-
 
     void testRun() {
-        try {
-           // inputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\launch.wav";
-           // outputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\new1.wav";
+        def inputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\launch.wav"
+        def outputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\new1.wav"
 
-        } catch (Exception e) {
-            System.err.println(e.toString())
-        }
+        String[] args = new String[2]
+        args[0] = inputPath
+        args[1] = outputPath
+
+        SunRadio.main(args)
     }
 
     void testMove() {
