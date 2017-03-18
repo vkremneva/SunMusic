@@ -56,7 +56,7 @@ public class LightLevel {
 
     private static int getAverageFakeLevel() {
         Random random = new Random();
-        return random.nextInt();
+        return random.nextInt(10) + 1;
     }
 
     static int getAverageLightLevel(double[] values) {

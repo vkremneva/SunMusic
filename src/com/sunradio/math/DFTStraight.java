@@ -1,6 +1,8 @@
 package com.sunradio.math;
 
 import com.external.Complex;
+import org.jetbrains.annotations.Contract;
+
 import java.util.Arrays;
 import static java.lang.Math.*;
 
@@ -48,7 +50,7 @@ public class DFTStraight {
      *
      * @return a double array which contains phase values
      */
-    public double[] getPhases() {
+    double[] getPhases() {
         double[] phases = new double[size];
         double allowance;
         for (int i = 0; i < size; i++) {
@@ -77,7 +79,7 @@ public class DFTStraight {
         return allowance + atan(data[n].im() / data[n].re());
     }
 
-    public static double getPhase(Complex[] data, int n) {
+    private static double getPhase(Complex[] data, int n) {
         double allowance;
         if (data[n].re() > 0) allowance = 0;
         else if (data[n].im() > 0) allowance = PI;
@@ -222,21 +224,40 @@ public class DFTStraight {
         }
     }
 
-    static Complex[] applyNewPhases(double[] newPhases, Complex[] oldData) {
+    /**
+     *  Applying new phases to chosen Complex array
+     *
+     * @param newPhases new phases to set
+     * @param oldData old data to set new phases to
+     * @return Complex array with new phases and untouched amplitudes
+     * @throws IllegalArgumentException if old data contains null
+     */
+    static Complex[] applyNewPhases(double[] newPhases, Complex[] oldData) throws IllegalArgumentException {
+        if (newPhases.length != oldData.length)
+            throw new IllegalArgumentException("Size of data to apply should be equal to old data size." +
+                    "\nSize of data to apply: " + newPhases.length +
+                    ". Size of old data: " + oldData.length + ".\n");
+
         double a, b, allowance;
         Complex[] result = new Complex[newPhases.length];
+
         for (int i = 0; i < newPhases.length; i++) {
-            if (oldData[i].re() > 0) allowance = 0;
-            else if (oldData[i].im() > 0) allowance = -PI;
-            else allowance = PI;
+            if (oldData[i] == null) {
+                throw new IllegalArgumentException("When applying new phases old data must be set.");
 
-            a = oldData[i].abs() / sqrt(1 + pow(tan(newPhases[i] + allowance), 2.0));
-            b = a * tan(newPhases[i] + allowance);
+            } else {
+                if (oldData[i].re() > 0) allowance = 0;
+                else if (oldData[i].im() > 0) allowance = -PI;
+                else allowance = PI;
 
-            //we get 'b' from equation for phase and 'a' from my condition:
-            //i want the real amplitudes be the same
+                a = oldData[i].abs() / sqrt(1 + pow(tan(newPhases[i] + allowance), 2.0));
+                b = a * tan(newPhases[i] + allowance);
 
-            result[i] = new Complex(a, b);
+                //we get 'b' from equation for phase and 'a' from my condition:
+                //i want the real amplitudes be the same
+
+                result[i] = new Complex(a, b);
+            }
         }
         return result;
     }
@@ -270,18 +291,22 @@ public class DFTStraight {
         double a, b;
         Complex[] result = new Complex[newAmplitudes.length];
         for (int i = 0; i < newAmplitudes.length; i++) {
-            if (getPhase(oldData, i) < 0) sign = -1;
-            else sign = 1;
-            b = pow(oldData[i].im(), 2.0) * pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0);
-            b = b / (pow(oldData[i].re(), 2.0) + pow(oldData[i].im(), 2.0));
-            b = sqrt(b);
+            if (oldData[i] == null) {
+                result[i] = new Complex(newAmplitudes[i], 0);
+            } else {
+                if (getPhase(oldData, i) < 0) sign = -1;
+                else sign = 1;
+                b = pow(oldData[i].im(), 2.0) * pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0);
+                b = b / (pow(oldData[i].re(), 2.0) + pow(oldData[i].im(), 2.0));
+                b = sqrt(b);
 
-            a = sign * sqrt(pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0) - pow(b, 2.0));
+                a = sign * sqrt(pow(newAmplitudes[i], 2.0) * pow(newAmplitudes.length, 2.0) - pow(b, 2.0));
 
-            //we get 'a' from equation for real amplitude and 'b' from my condition:
-            //i want the real phase be the same
+                //we get 'a' from equation for real amplitude and 'b' from my condition:
+                //i want the real phase be the same
 
-            result[i] = new Complex(a, b);
+                result[i] = new Complex(a, b);
+            }
         }
 
         return result;

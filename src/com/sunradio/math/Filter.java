@@ -68,12 +68,11 @@ public class Filter {
     public static double[] apply(double[] amplitudes, double[] windowFunc)
             throws IllegalArgumentException {
 
-        int size = amplitudes.length;
+        if (amplitudes.length > windowFunc.length) throw new IllegalArgumentException("Length of window function is too small\n" +
+                "Size of amplitudes array: " + amplitudes.length + ". Size of windowFunc: " + windowFunc.length);
 
-        if (size > windowFunc.length) throw new IllegalArgumentException("Length of window function is too small");
-
-        double[] result = new double[size];
-        for (int i = 0; i < size; i++) {
+        double[] result = new double[amplitudes.length];
+        for (int i = 0; i < amplitudes.length; i++) {
             result[i] = amplitudes[i] * windowFunc[i];
         }
         return result;
