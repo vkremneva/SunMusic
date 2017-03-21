@@ -54,12 +54,18 @@ public class LightLevel {
         return getLightLevel(values.length, minVal, maxVal);
     }
 
-    private static int getAverageFakeLevel() {
+    private static int getAverageFakeLevel(int max) {
         Random random = new Random();
-        return random.nextInt(10) + 1;
+        return random.nextInt(max);
     }
 
     static int getAverageLightLevel(double[] values) {
-        return getAverageFakeLevel();
+        int MAX_LIGHT_LEVEL = 10;
+        int lightLevel = getAverageFakeLevel(MAX_LIGHT_LEVEL);
+
+        //light level should be one of 2's degree
+        lightLevel = (int)Math.pow(2, lightLevel);
+
+        return lightLevel;
     }
 }
