@@ -25,6 +25,7 @@ public class Scale {
             from = to; to = temp;
         }
 
+        double[] scaledLightLevel = new double[size];
         double maxLevel = arr[0].doubleValue();
         double minLevel = arr[0].doubleValue();
         double current;
@@ -35,11 +36,17 @@ public class Scale {
             else if (current < minLevel) minLevel = current;
         }
 
+        if (maxLevel == minLevel) {
+            minLevel = 0;
+            maxLevel = 1024;
+            //todo: generalize
+        }
+
         double step = (to - from) / (maxLevel - minLevel);
 
-        double [] scaledLightLevel = new double [size];
         for (int i = 0; i < size; i++)
             scaledLightLevel[i] = (arr[i].doubleValue() - minLevel) * step + from;
+
 
         return scaledLightLevel;
     }
