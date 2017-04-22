@@ -9,8 +9,8 @@ import com.sunradio.math.Filter
 class SunRadioTest extends GroovyTestCase {
 
     void testRun() {
-        def inputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\launch.wav"
-        def outputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadio\\new1.wav"
+        def inputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadioo\\launch.wav"
+        def outputPath = "C:\\Users\\LEV\\IdeaProjects\\SunRadioo\\new.wav"
 
         String[] args = new String[2]
         args[0] = inputPath

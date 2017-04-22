@@ -1,10 +1,7 @@
 package com.sunradio.core;
 
 import com.external.WavFile;
-import com.sunradio.math.DFTInverse;
-import com.sunradio.math.DFTStraight;
-import com.sunradio.math.Filter;
-import com.sunradio.math.ToneModulation;
+import com.sunradio.math.*;
 
 import java.io.File;
 /*
@@ -59,11 +56,10 @@ public class SunRadio {
     /**
      * Create empty output file like input file but stretched
      *
-     * @param outputPath path where to create output file
      * @param stretch in how many times we want to stretch
      * @return empty stretched wav file
      */
-    private WavFile createStretchedOutputFile(String outputPath, int stretch) {
+    private WavFile createStretchedOutputFile(int stretch) {
         try {
             return WavFile.newWavFile(new File(outputPath),
                     wavInput.getNumChannels(), wavInput.getNumFrames() * stretch,
@@ -74,6 +70,10 @@ public class SunRadio {
         }
 
         return new WavFile();
+    }
+
+    private WavFile createOutputFile() {
+        return createStretchedOutputFile(1);
     }
 
     /**
@@ -114,6 +114,7 @@ public class SunRadio {
      * Run the process of modulation and play the result
      */
     private void run() {
+        /*
         WavFile stretchedOutputFile;
         double[] buffer = new double[bufferIndAmount * 2];
         double[] secondaryBuffer = new double[bufferIndAmount];
@@ -180,19 +181,46 @@ public class SunRadio {
                     //write data to new .waw file
                     stretchedOutputFile.writeFrames(outputBuffer, FRAMES);
 
-                    toneModulation.setPreviousData(transformable);
+                    //toneModulation.setPreviousData(transformable);
                     count++;
                 } while (frames_read != 0);
 
                 assembleWavFiles(outputPath, count);
 
-                //todo: adjust volume
                 //todo: fasten velocity of playback
                 //play(outputPath);
             }
 
         } catch (Exception e) {
             System.err.println(e.toString());
+        }
+        */
+
+        double[] buffer = new double[bufferIndAmount * 2];
+        int lightLevel, framesRead;
+
+        wavOutput = createOutputFile();
+
+        try {
+            framesRead = wavInput.readFrames(buffer, FRAMES);
+            if (framesRead != 0) {
+                do {
+                    //lightLevel = LightLevel.getAverageLightLevel(buffer);
+                    lightLevel = 1024;
+
+                    framesRead = wavInput.readFrames(buffer, FRAMES);
+
+                    buffer = AM.modulate(buffer, lightLevel);
+
+                    wavOutput.writeFrames(buffer, FRAMES);
+                }
+                while (framesRead != 0);
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.toString());
+            e.printStackTrace();
         }
     }
 
