@@ -7,6 +7,29 @@ package com.sunradio.math;
 public class Scale {
 
     /**
+     * Scale number on specific range
+     *
+     * @param number is number to scale
+     * @param from is the lower bound of scaling
+     * @param to is the upper bound of scaling
+     * @param maxLevel is an amount of estimated steps
+     * @return scaled array of data
+     */
+    static double run(double number, double from, double to, double maxLevel)
+            throws IllegalArgumentException {
+
+        if (from > to) {
+            double temp = from;
+            from = to;
+            to = temp;
+        }
+
+        double step = (to - from) / maxLevel;
+
+        return number * step + from;
+    }
+
+    /**
      * Scale numeric data
      *
      * @param arr is an array of data to scale
@@ -39,7 +62,6 @@ public class Scale {
         if (maxLevel == minLevel) {
             minLevel = 0;
             maxLevel = 1024;
-            //todo: generalize
         }
 
         double step = (to - from) / (maxLevel - minLevel);
