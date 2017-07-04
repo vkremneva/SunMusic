@@ -1,7 +1,6 @@
 package com.sunradio.core;
 
 import com.sunradio.math.Scale;
-
 import static java.lang.Math.*;
 import java.util.Random;
 
@@ -10,6 +9,8 @@ import java.util.Random;
  * @author V.Kremneva
  */
 public class LightLevel {
+
+    public static int MAX = 1024;
 
     /**
      * Get randomised light level
