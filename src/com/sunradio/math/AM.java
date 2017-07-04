@@ -1,10 +1,14 @@
 package com.sunradio.math;
 
+import com.sunradio.core.LightLevel;
+
 /**
  * Amplitude modulation
  * @author V.Kremneva
  */
 public class AM {
+
+    private static double COEFF = 0.65;
 
     /**
      * Modulate values according to conditions with the coefficient of modulation -0.65.
@@ -16,11 +20,11 @@ public class AM {
      * @throws IllegalArgumentException if amount of conditions is less than amount of values
      */
     public static double[] modulate(double[] values, double[] conditions) {
-        return modulate(values, conditions, -0.65);
+        return modulate(values, conditions, COEFF);
     }
 
     /**
-     * Modulate values according to conditions with the coefficient of modulation -0.65.
+     * Modulate values according to conditions with the coefficient of modulation 0.65.
      * Assume 'values' as amplitude values therefore perform an Amplitude Modulation.
      *
      * @param values an array with amplitude values to modulate
@@ -29,15 +33,15 @@ public class AM {
      * @throws IllegalArgumentException if amount of conditions is less than amount of values
      */
     public static double[] modulate(double[] values, double condition) {
-        double[] conditions;
-        Double[] conditionsInDouble = new Double[values.length];
+        double[] conditionsInDouble = new double[values.length];
+        double scaledCondition;
+
+        scaledCondition = Scale.run(condition, -1, 1, LightLevel.MAX);
 
         for (int i = 0; i < values.length; i++)
-            conditionsInDouble[i] = condition;
+            conditionsInDouble[i] = scaledCondition;
 
-        conditions = Scale.run(conditionsInDouble, 0, 1);
-
-        return modulate(values, conditions, -0.65);
+        return modulate(values, conditionsInDouble, COEFF);
     }
 
     /**
@@ -62,16 +66,8 @@ public class AM {
         double[] modulated;
         modulated = new double[values.length];
 
-        double maxCond;
-        maxCond = conditions[0];
-        for (int i = 1; i < values.length; i++)
-            if (conditions[i] > maxCond) maxCond = conditions[i];
-
-        for (int i = 0; i < values.length; i++) {
-            modulated[i] = values[i] * (1 + modulationCoeff * conditions[i] / Math.abs(maxCond));
-            if (values[i] != 0)
-                System.out.println(values[i] + " " + modulated[i]);
-        }
+        for (int i = 0; i < values.length; i++)
+            modulated[i] = values[i] * (1 + modulationCoeff * conditions[i]);
 
         return modulated;
     }

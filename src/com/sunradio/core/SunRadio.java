@@ -110,11 +110,7 @@ public class SunRadio {
         }
     }
 
-    /**
-     * Run the process of modulation and play the result
-     */
-    private void run() {
-        /*
+    private void adjustToneAccordingToLightLevel() {
         WavFile stretchedOutputFile;
         double[] buffer = new double[bufferIndAmount * 2];
         double[] secondaryBuffer = new double[bufferIndAmount];
@@ -176,10 +172,11 @@ public class SunRadio {
                         outputBuffer = move(outputBuffer, overlapIndAmount);
                     }
 
-                    stretchedOutputFile = createStretchedOutputFile(outputPath + count, lightLevel);
+                    //TODO: correct parameters
+                    //stretchedOutputFile = createStretchedOutputFile(outputPath + count, lightLevel);
 
-                    //write data to new .waw file
-                    stretchedOutputFile.writeFrames(outputBuffer, FRAMES);
+                    //write data to new .waw file TODO: remove //
+                    //stretchedOutputFile.writeFrames(outputBuffer, FRAMES);
 
                     //toneModulation.setPreviousData(transformable);
                     count++;
@@ -194,8 +191,9 @@ public class SunRadio {
         } catch (Exception e) {
             System.err.println(e.toString());
         }
-        */
+    }
 
+    private void adjustVolumeAccordingToLightLevel() {
         double[] buffer = new double[bufferIndAmount * 2];
         int lightLevel, framesRead;
 
@@ -203,11 +201,12 @@ public class SunRadio {
 
         try {
             framesRead = wavInput.readFrames(buffer, FRAMES);
+
+            //TODO: smooth array of light levels
+            lightLevel = LightLevel.getAverageLightLevel(buffer);
+
             if (framesRead != 0) {
                 do {
-                    //lightLevel = LightLevel.getAverageLightLevel(buffer);
-                    lightLevel = 1024;
-
                     framesRead = wavInput.readFrames(buffer, FRAMES);
 
                     buffer = AM.modulate(buffer, lightLevel);
@@ -222,6 +221,15 @@ public class SunRadio {
             System.err.println(e.toString());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Run the process of modulation and play the result
+     */
+    private void run() {
+        //adjustToneAccordingToLightLevel();
+
+        adjustVolumeAccordingToLightLevel();
     }
 
     /**
