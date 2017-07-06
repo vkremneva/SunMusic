@@ -60,7 +60,7 @@ public class LightLevel {
         return random.nextInt(max);
     }
 
-    static int getAverageLightLevel(double[] values) {
+    static int getAverageLightLevel() {
         int MAX_LIGHT_LEVEL = 10;
         int lightLevel = getAverageFakeLevel(MAX_LIGHT_LEVEL);
 
