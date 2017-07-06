@@ -129,7 +129,7 @@ public class SunRadio {
             frames_read = wavInput.readFrames(buffer, FRAMES);
 
             //get current level of light
-            lightLevel = LightLevel.getAverageLightLevel(buffer);
+            lightLevel = LightLevel.get();
 
             //stretching size of output buffer
             outputBufferIndAmount *= lightLevel;
@@ -203,7 +203,7 @@ public class SunRadio {
             framesRead = wavInput.readFrames(buffer, FRAMES);
 
             //TODO: smooth array of light levels
-            lightLevel = LightLevel.getAverageLightLevel(buffer);
+            lightLevel = LightLevel.get();
 
             if (framesRead != 0) {
                 do {
