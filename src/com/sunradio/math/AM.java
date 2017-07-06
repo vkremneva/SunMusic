@@ -36,7 +36,7 @@ public class AM {
         double[] conditionsInDouble = new double[values.length];
         double scaledCondition;
 
-        scaledCondition = Scale.run(condition, -1, 1, LightLevel.MAX);
+        scaledCondition = Scale.runLog(condition, -1, 1, LightLevel.MAX);
 
         for (int i = 0; i < values.length; i++)
             conditionsInDouble[i] = scaledCondition;

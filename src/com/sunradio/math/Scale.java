@@ -13,7 +13,7 @@ public class Scale {
      * @param from is the lower bound of scaling
      * @param to is the upper bound of scaling
      * @param maxLevel is an amount of estimated steps
-     * @return scaled array of data
+     * @return scaled number
      */
     static double run(double number, double from, double to, double maxLevel)
             throws IllegalArgumentException {
@@ -25,6 +25,31 @@ public class Scale {
         }
 
         double step = (to - from) / maxLevel;
+
+        return number * step + from;
+    }
+
+    /**
+     * Scale number on specific range
+     *
+     * @param number is number to scale
+     * @param from is the lower bound of scaling
+     * @param to is the upper bound of scaling
+     * @param maxLevel is an amount of estimated steps
+     * @return logarithmically scaled number
+     */
+    static double runLog(double number, double from, double to, double maxLevel)
+            throws IllegalArgumentException {
+
+        if (from > to) {
+            double temp = from;
+            from = to;
+            to = temp;
+        }
+
+        double step = (to - from) / maxLevel;
+
+        number = Math.log(number) / Math.log(2.0);
 
         return number * step + from;
     }
