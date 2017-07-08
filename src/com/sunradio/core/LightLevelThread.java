@@ -1,31 +1,34 @@
 package com.sunradio.core;
 
-class LightLevelRunnable implements Runnable {
-    private Thread thread;
+class LightLevelThread extends Thread {
     private volatile int lightLevel;
     private int currentDelay;
 
-    LightLevelRunnable(int delay) {
+    LightLevelThread(int delay) {
+        lightLevel = LightLevel.MAX / 2;
         currentDelay = delay;
-        thread = new Thread(this, "Current light level");
-        thread.start();
     }
 
+    public int getLightLevel() {
+        return lightLevel;
+    }
+
+    @Override
     public void run() {
         try {
             int storageSize = currentDelay / 1000;
             int[] storage = new int[storageSize];
 
-            for (int i = 0; i < storageSize - 2; i++) {
+            for (int i = 0; i < storageSize - 1; i++) {
                 storage[i] = LightLevel.get();
                 Thread.sleep(1000);
             }
 
-            while (!thread.isInterrupted()) {
+            while (!Thread.interrupted()) {
                 storage[storageSize - 1] = LightLevel.get();
 
                 int averageLightLevel = 0;
-                for (int i = 0; i < storageSize - 1; i++)
+                for (int i = 0; i < storageSize; i++)
                     averageLightLevel += storage[i];
                 averageLightLevel /= storageSize;
 
