@@ -2,39 +2,52 @@ package com.sunradio.core;
 
 class LightLevelThread extends Thread {
     private volatile int lightLevel;
-    private int currentDelay;
+    private volatile int prevLightLevel;
 
-    LightLevelThread(int delay) {
+    LightLevelThread() {
         lightLevel = LightLevel.MAX / 2;
-        currentDelay = delay;
+        prevLightLevel = LightLevel.MAX / 2;
     }
 
     public int getLightLevel() {
         return lightLevel;
     }
 
+    private int smooth(int previous, int current) {
+        int difference = Math.abs(current - previous);
+        int result;
+
+        if (current > previous) {
+            if (difference < LightLevel.MAX / 2)
+                result = (current + previous) / 2;
+            else if (difference < (LightLevel.MAX - 1))
+                result = (current + previous) / 2 - 1;
+            else
+                result = (current + previous) / 2 - 2;
+
+        } else {
+            if (difference < LightLevel.MAX / 2)
+                result = (current + previous) / 2;
+            else if (difference < (LightLevel.MAX - 1))
+                result = (current + previous) / 2 + 1;
+            else
+                result = (current + previous) / 2 + 2;
+        }
+
+        return result;
+    }
+
     @Override
     public void run() {
         try {
-            int storageSize = currentDelay / 1000;
-            int[] storage = new int[storageSize];
-
-            for (int i = 0; i < storageSize - 1; i++) {
-                storage[i] = LightLevel.get();
-                Thread.sleep(1000);
-            }
-
             while (!Thread.interrupted()) {
-                storage[storageSize - 1] = LightLevel.get();
 
-                int averageLightLevel = 0;
-                for (int i = 0; i < storageSize; i++)
-                    averageLightLevel += storage[i];
-                averageLightLevel /= storageSize;
+                prevLightLevel = lightLevel;
 
-                lightLevel = averageLightLevel;
+                lightLevel = LightLevel.get();
 
-                System.arraycopy(storage, 1, storage, 0, storageSize - 1);
+                lightLevel = smooth(prevLightLevel, lightLevel);
+
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
