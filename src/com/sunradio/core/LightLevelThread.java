@@ -50,8 +50,6 @@ class LightLevelThread extends Thread {
 
                 Thread.sleep(1000);
             }
-        } catch (InterruptedException e) {
-            System.err.println(e.toString());
-        }
+        } catch (InterruptedException e) {}
     }
 }
