@@ -16,6 +16,7 @@ import javax.sound.sampled.Clip;
 public class SunRadio {
     private final int FRAMES = 4096; //amount of frames to read
     private final int OVERLAP = 16; //coefficient of overlap
+    private final int SPARSENESS = 3; //how much FRAMES we modulate with single light level
 
     private WavFile wavInput; //input file
     private WavFile wavOutput; //output file
@@ -205,8 +206,20 @@ public class SunRadio {
 
             framesRead = wavInput.readFrames(buffer, FRAMES);
 
+            lightLevel = threadLightLevel.getLightLevel();
+
             if (framesRead != 0) {
-                do {
+                for (int i = 0; framesRead != 0; i++) {
+                    if ((i % SPARSENESS) == 0)
+                        lightLevel = threadLightLevel.getLightLevel();
+
+                    framesRead = wavInput.readFrames(buffer, FRAMES);
+
+                    buffer = AM.modulate(buffer, lightLevel);
+
+                    wavOutput.writeFrames(buffer, FRAMES);
+                }
+                /*do {
                     lightLevel = threadLightLevel.getLightLevel();
 
                     framesRead = wavInput.readFrames(buffer, FRAMES);
@@ -215,8 +228,10 @@ public class SunRadio {
 
                     wavOutput.writeFrames(buffer, FRAMES);
                 }
-                while (framesRead != 0);
+                while (framesRead != 0);*/
             }
+
+            threadLightLevel.interrupt();
         }
         catch (Exception e)
         {
