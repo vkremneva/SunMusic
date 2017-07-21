@@ -1,31 +1,25 @@
 package com.sunradio.core;
 
+import com.external.Sound;
 import com.external.WavFile;
 import com.sunradio.math.*;
 
 import java.io.File;
-/*
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-*/
 
 /**
  * @author V.Kremneva
  */
 public class SunRadio {
     private final int FRAMES = 4096; //amount of frames to read
-    private final int OVERLAP = 16; //coefficient of overlap
-    private final int SPARSENESS = 3; //how much FRAMES we modulate with single light level
 
     private WavFile wavInput; //input file
     private WavFile wavOutput; //output file
 
     private int bufferIndAmount; //amount of indexes in 'buffer' array needed to read data to
-    private int overlapIndAmount; //amount of indexes to work with overlap
-    private int offset; //amount of new frames read in each step of cycle
-    private int outputBufferIndAmount; //amount of indexes in am array to write
-    private long wholeIndAmount; //amount of pieces to read in whole file
+    //private int overlapIndAmount; //amount of indexes to work with overlap
+    //private int offset; //amount of new frames read in each step of cycle
+    //private int outputBufferIndAmount; //amount of indexes in am array to write
+    //private long wholeIndAmount; //amount of pieces to read in whole file
     private String outputPath; //path to save output file
 
     /**
@@ -47,20 +41,20 @@ public class SunRadio {
 
         int numChannels = wavInput.getNumChannels();
         bufferIndAmount = FRAMES * numChannels;
-        overlapIndAmount = OVERLAP * numChannels;
-        offset = FRAMES / OVERLAP;
-        outputBufferIndAmount = bufferIndAmount + overlapIndAmount;
-        wholeIndAmount = wavInput.getNumFrames() * numChannels;
+        //overlapIndAmount = OVERLAP * numChannels;
+        //offset = FRAMES / OVERLAP;
+        //outputBufferIndAmount = bufferIndAmount + overlapIndAmount;
+        //wholeIndAmount = wavInput.getNumFrames() * numChannels;
         outputPath = args[1];
     }
 
-    /**
+    /*/**
      * Create empty output file like input file but stretched
      *
      * @param stretch in how many times we want to stretch
      * @return empty stretched wav file
      */
-    private WavFile createStretchedOutputFile(int stretch) {
+    /*private WavFile createStretchedOutputFile(int stretch) {
         try {
             return WavFile.newWavFile(new File(outputPath),
                     wavInput.getNumChannels(), wavInput.getNumFrames() * stretch,
@@ -71,18 +65,27 @@ public class SunRadio {
         }
 
         return new WavFile();
-    }
+    }*/
 
     private WavFile createOutputFile() {
-        return createStretchedOutputFile(1);
+        try {
+            return WavFile.newWavFile(new File(outputPath),
+                    wavInput.getNumChannels(), wavInput.getNumFrames(),
+                    wavInput.getValidBits(), wavInput.getSampleRate());
+
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
+
+        return new WavFile();
     }
 
-    /**
+    /*/**
      * Create 'wavOutput' file as the sum of another wav files
      * @param outputPath initial path to another wav files
      * @param amount amount and in thi case step between wav files
      */
-    private void assembleWavFiles(String outputPath, int amount) { //todo: universalize
+    /*private void assembleWavFiles(String outputPath, int amount) { //todo: universalize
         int framesAmount = 0;
         double[] buffer;
         WavFile temp;
@@ -109,9 +112,10 @@ public class SunRadio {
         } catch (Exception e) {
             System.err.println(e.toString());
         }
-    }
+    }*/
 
-    private void adjustToneAccordingToLightLevel() {
+    /*private void adjustToneAccordingToLightLevel() {
+        final int OVERLAP = 16; //coefficient of overlap
         WavFile stretchedOutputFile;
         double[] buffer = new double[bufferIndAmount * 2];
         double[] secondaryBuffer = new double[bufferIndAmount];
@@ -192,7 +196,7 @@ public class SunRadio {
         } catch (Exception e) {
             System.err.println(e.toString());
         }
-    }
+    }*/
 
     private void adjustVolumeAccordingToLightLevel() {
         double[] buffer = new double[bufferIndAmount * 2];
@@ -201,7 +205,12 @@ public class SunRadio {
         wavOutput = createOutputFile();
 
         try {
-            LightLevelThread threadLightLevel = new LightLevelThread();
+            final int SPARSENESS = 4; //how much FRAMES we modulate with single light level
+            final int SLEEP = 500; //how often we get value of light level
+
+            //we got smooth values of light level when sleep in
+            //'LightLevelThread' equals 'SLEEP' * 'SPARSENESS' mills
+            LightLevelThread threadLightLevel = new LightLevelThread(SLEEP * SPARSENESS);
             threadLightLevel.start();
 
             framesRead = wavInput.readFrames(buffer, FRAMES);
@@ -213,22 +222,16 @@ public class SunRadio {
                     if ((i % SPARSENESS) == 0)
                         lightLevel = threadLightLevel.getLightLevel();
 
-                    framesRead = wavInput.readFrames(buffer, FRAMES);
-
-                    buffer = AM.modulate(buffer, lightLevel);
-
-                    wavOutput.writeFrames(buffer, FRAMES);
-                }
-                /*do {
-                    lightLevel = threadLightLevel.getLightLevel();
+                    System.out.println(lightLevel);
 
                     framesRead = wavInput.readFrames(buffer, FRAMES);
 
                     buffer = AM.modulate(buffer, lightLevel);
 
                     wavOutput.writeFrames(buffer, FRAMES);
+
+                    Thread.sleep(SLEEP);
                 }
-                while (framesRead != 0);*/
             }
 
             threadLightLevel.interrupt();
@@ -263,32 +266,18 @@ public class SunRadio {
         }
     }
 
-    /**
+    /*/**
      *  Move data to the left with filling with 0
      * @param data data to move
      * @param offset amount of steps to move
      * @return array with nulls in the end and 'data' values moved on offset
      */
-    public static double[] move(double[] data, int offset) {
+    /*public static double[] move(double[] data, int offset) {
         double[] result = new double[data.length];
 
         System.arraycopy(data, offset, result, 0, data.length - offset);
 
         return result;
-    }
-
-    /*private static void play(String pathname) {
-        try {
-            Clip c = AudioSystem.getClip();
-            AudioInputStream ais = AudioSystem.getAudioInputStream(new File(pathname));
-
-            c.open(ais);
-            c.loop(0);
-
-            Thread.sleep(1000);
-        } catch (Exception e) {
-            System.err.println(e.toString());
-        }
     }*/
 
     public static void main(String[] args) {
@@ -297,6 +286,8 @@ public class SunRadio {
         radio.openWavFile(args);
 
         radio.run();
+
+        Sound.playSound(args[1]).join();
 
         radio.closeFiles();
     }

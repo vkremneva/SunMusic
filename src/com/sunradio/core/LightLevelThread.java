@@ -2,11 +2,16 @@ package com.sunradio.core;
 
 class LightLevelThread extends Thread {
     private volatile int lightLevel;
-    private volatile int prevLightLevel;
+    private int sleep;
 
     LightLevelThread() {
         lightLevel = LightLevel.MAX / 2;
-        prevLightLevel = LightLevel.MAX / 2;
+        sleep = 500;
+    }
+
+    LightLevelThread(int sleepValue) {
+        lightLevel = LightLevel.MAX / 2;
+        sleep = sleepValue;
     }
 
     public int getLightLevel() {
@@ -41,14 +46,13 @@ class LightLevelThread extends Thread {
     public void run() {
         try {
             while (!Thread.interrupted()) {
+                int newLightLevel;
 
-                prevLightLevel = lightLevel;
+                newLightLevel = LightLevel.get();
 
-                lightLevel = LightLevel.get();
+                lightLevel = smooth(newLightLevel, lightLevel);
 
-                lightLevel = smooth(prevLightLevel, lightLevel);
-
-                Thread.sleep(1000);
+                Thread.sleep(sleep);
             }
         } catch (InterruptedException e) {}
     }
