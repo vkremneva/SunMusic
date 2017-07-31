@@ -1,4 +1,4 @@
-package com.sunradio.core;
+package main.java.core;
 
 class LightLevelThread extends Thread {
     private volatile int lightLevel;

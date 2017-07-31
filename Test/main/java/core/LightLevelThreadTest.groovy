@@ -1,4 +1,4 @@
-package com.sunradio.core
+package main.java.core
 
 class LightLevelThreadTest extends GroovyTestCase {
 

@@ -1,8 +1,8 @@
-package com.sunradio.core;
+package main.java.core;
 
-import com.external.Sound;
-import com.external.WavFile;
-import com.sunradio.math.*;
+import main.java.core.external.Sound;
+import main.java.core.external.WavFile;
+import main.java.core.math.AM;
 
 import java.io.File;
 

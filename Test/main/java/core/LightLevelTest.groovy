@@ -1,3 +1,3 @@
-package com.sunradio.core
+package main.java.core
 
 class LightLevelTest extends GroovyTestCase {}

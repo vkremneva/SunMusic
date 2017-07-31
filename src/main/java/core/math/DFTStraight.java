@@ -1,7 +1,6 @@
-package com.sunradio.math;
+package main.java.core.math;
 
-import com.external.Complex;
-import org.jetbrains.annotations.Contract;
+import main.java.core.external.Complex;
 
 import java.util.Arrays;
 import static java.lang.Math.*;

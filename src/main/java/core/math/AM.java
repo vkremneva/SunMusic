@@ -1,6 +1,6 @@
-package com.sunradio.math;
+package main.java.core.math;
 
-import com.sunradio.core.LightLevel;
+import main.java.core.LightLevel;
 
 /**
  * Amplitude modulation

@@ -1,4 +1,4 @@
-package com.sunradio.math;
+package main.java.core.math;
 
 /**
  * Exception for ToneModulation class

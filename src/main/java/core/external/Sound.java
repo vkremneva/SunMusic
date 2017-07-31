@@ -1,4 +1,4 @@
-package com.external;
+package main.java.core.external;
 
 import java.io.File;
 import java.io.IOException;

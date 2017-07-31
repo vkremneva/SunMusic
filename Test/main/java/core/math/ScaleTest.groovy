@@ -1,4 +1,4 @@
-package com.sunradio.math
+package main.java.core.math
 
 class ScaleTest extends GroovyTestCase {
     void testRun() {

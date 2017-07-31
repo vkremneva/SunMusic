@@ -1,6 +1,6 @@
-package com.sunradio.math;
+package main.java.core.math;
 
-import com.external.Complex;
+import main.java.core.external.Complex;
 
 /**
  * Tone modulation.

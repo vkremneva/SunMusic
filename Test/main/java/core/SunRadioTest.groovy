@@ -1,10 +1,4 @@
-package com.sunradio.core
-
-import com.external.WavFile
-import com.sunradio.math.AM
-import com.sunradio.math.DFTInverse
-import com.sunradio.math.DFTStraight
-import com.sunradio.math.Filter
+package main.java.core
 
 class SunRadioTest extends GroovyTestCase {
 

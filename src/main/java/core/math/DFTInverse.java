@@ -1,8 +1,6 @@
-package com.sunradio.math;
+package main.java.core.math;
 
-import com.external.Complex;
-
-import java.util.Arrays;
+import main.java.core.external.Complex;
 
 import static java.lang.Math.PI;
 

@@ -5,7 +5,7 @@
  * Author's website: <a href="http://wphooper.com">http://wphooper.com</a>. 
  */
 
-package com.external;
+package main.java.core.external;
 
 /**
  * This class stores a complex number, and allows the user to do arithmetic

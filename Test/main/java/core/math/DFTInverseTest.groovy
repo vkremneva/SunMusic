@@ -1,4 +1,4 @@
-package com.sunradio.math
+package main.java.core.math
 
 import static java.lang.Math.PI
 import static java.lang.Math.sin

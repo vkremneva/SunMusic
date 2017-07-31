@@ -1,4 +1,4 @@
-package com.sunradio.core;
+package main.java.core;
 
 import java.util.Random;
 
