@@ -14,7 +14,7 @@ class DFTInverseTest extends GroovyTestCase {
     double[] outcome_inverse = new double[ITERATIONS]
 
     // f(t) = sin(t)
-    public void testSin() {
+    void testSin() {
         //Split the sinus period in SPLIT pieces and take the sinus value in each of them
         for (int i = 0; i < ITERATIONS; i++)
             income[i] = sin(2 * PI * i / SPLIT)
@@ -22,8 +22,8 @@ class DFTInverseTest extends GroovyTestCase {
         outcome_straight.run(income)
         outcome_inverse = DFTInverse.run(outcome_straight.getData())
 
-        double difference;
-        int amount = 0;
+        double difference
+        int amount = 0
         for (int i = 0; i < ITERATIONS; i++) {
             difference = outcome_inverse[i] - income[i]
             if (difference > EPS) amount++
@@ -33,7 +33,7 @@ class DFTInverseTest extends GroovyTestCase {
     }
 
     //f(t) = NUMBER*sin(t) + sin(Number*t)
-    public void testTwoSin() throws IllegalArgumentException {
+    void testTwoSin() throws IllegalArgumentException {
         if ((NUMBER > SPLIT) || (NUMBER < SPLIT / 2))
             throw new IllegalArgumentException("Number should be less than SPLIT and more than SPLIT/2 due to sinus period")
 
@@ -44,8 +44,8 @@ class DFTInverseTest extends GroovyTestCase {
         outcome_straight.run(income)
         outcome_inverse = DFTInverse.run(outcome_straight.getData())
 
-        double difference;
-        int amount = 0;
+        double difference
+        int amount = 0
         for (int i = 0; i < ITERATIONS; i++) {
             difference = outcome_inverse[i] - income[i]
             if (difference > EPS) amount++

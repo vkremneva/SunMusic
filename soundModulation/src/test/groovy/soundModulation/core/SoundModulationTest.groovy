@@ -9,6 +9,6 @@ class SoundModulationTest extends GroovyTestCase {
         SoundModulation action = new SoundModulation()
         action.modulateAmplitudes(inputFile)
 
-        Sound.playSound(inputFile)
+        Sound.playSound(inputFile).join()
     }
 }

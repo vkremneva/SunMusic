@@ -86,8 +86,6 @@ class SunRadio {
                     if ((i % SPARSENESS) == 0)
                         lightLevel = threadLightLevel.getLightLevel();
 
-                    System.out.println(lightLevel);
-
                     framesRead = wavInput.readFrames(buffer, FRAMES);
 
                     buffer = AM.modulate(buffer, lightLevel);
