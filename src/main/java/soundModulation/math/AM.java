@@ -1,6 +1,6 @@
-package main.java.core.math;
+package soundModulation.math;
 
-import main.java.core.LightLevel;
+import soundModulation.core.LightLevel;
 
 /**
  * Amplitude modulation

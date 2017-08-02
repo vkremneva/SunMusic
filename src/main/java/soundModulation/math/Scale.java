@@ -1,4 +1,4 @@
-package main.java.core.math;
+package soundModulation.math;
 
 /**
  * Helps to scale data

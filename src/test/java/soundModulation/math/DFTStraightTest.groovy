@@ -1,4 +1,4 @@
-package main.java.core.math
+package soundModulation.math
 
 import static java.lang.Math.*
 
@@ -114,7 +114,7 @@ class DFTStraightTest extends GroovyTestCase {
             oldPhase = dftStraight.getPhase(i)
             newPhase = dftStraightApplied.getPhase(i)
 
-            assert abs(oldPhase - newPhase)  < EPS
+            assert Math.abs(oldPhase - newPhase)  < EPS
         }
     }
 
@@ -140,7 +140,7 @@ class DFTStraightTest extends GroovyTestCase {
             oldAmplitude = dftStraight.getAmplitude(i)
             newAmplitude = dftStraightApplied.getAmplitude(i)
 
-            assert abs(oldAmplitude - newAmplitude) < EPS
+            assert Math.abs(oldAmplitude - newAmplitude) < EPS
        }
     }
 }

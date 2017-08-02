@@ -1,6 +1,6 @@
-package main.java.core.math;
+package soundModulation.math;
 
-import main.java.core.external.Complex;
+import soundModulation.external.Complex;
 
 import static java.lang.Math.PI;
 

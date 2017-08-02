@@ -1,4 +1,4 @@
-package main.java.core.math
+package soundModulation.math
 
 import static java.lang.Math.PI
 import static java.lang.Math.sin

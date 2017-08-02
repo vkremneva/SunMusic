@@ -4,8 +4,7 @@
  * 
  * Author's website: <a href="http://wphooper.com">http://wphooper.com</a>. 
  */
-
-package main.java.core.external;
+package soundModulation.external;
 
 /**
  * This class stores a complex number, and allows the user to do arithmetic

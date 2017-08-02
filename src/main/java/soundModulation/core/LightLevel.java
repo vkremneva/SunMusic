@@ -1,4 +1,4 @@
-package main.java.core;
+package soundModulation.core;
 
 import java.util.Random;
 

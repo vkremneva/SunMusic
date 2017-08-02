@@ -1,4 +1,4 @@
-package main.java.core.external;
+package soundModulation.external;
 
 import java.io.*;
 

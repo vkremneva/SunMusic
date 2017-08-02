@@ -1,4 +1,4 @@
-package main.java.core.external;
+package soundModulation.external;
 
 /**
  * Exception for WavFile Class

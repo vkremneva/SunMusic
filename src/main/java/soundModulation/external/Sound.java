@@ -1,4 +1,4 @@
-package main.java.core.external;
+package soundModulation.external;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,6 @@ public class Sound {
 	/*
 	  breakOld определяет поведение, если звук уже играется
 	  Если reakOld==true, о звук будет прерван и запущен заново
-	  Иначе ничего не произойдёт
 	*/
     public void play(boolean breakOld) {
         if (released) {
